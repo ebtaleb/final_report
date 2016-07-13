@@ -16,6 +16,10 @@
 \usepackage{biblatex}
 \nocite{*}
 
+\lstset{
+    language=[Objective]Caml
+}
+
 \usepackage[nottoc]{tocbibind}
 
 \usepackage{xcolor}
@@ -40,7 +44,6 @@
 
 % ---------------------------------------------------------------
 \frontmatter
-
     \include{./misc/titlepage}
    	\thispagestyle{empty}
     
@@ -52,9 +55,7 @@
     \thispagestyle{empty}
     
 % --------------------------------------------------------------
-
 \mainmatter % comment single chapters for faster compilation
-
     \input{./chapters/chapter1}
     \input{./chapters/chapter2}
     \input{./chapters/chapter3}
