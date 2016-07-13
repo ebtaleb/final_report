@@ -1,0 +1,15 @@
+*.aux
+*.glo
+*.ist
+*.log
+*.lot
+*.out
+*.toc
+*.lof
+*.swp
+*.pdf
+*.bbl
+*.bcf
+*.blg
+*.xml
+*.pdf

@@ -1,0 +1,44 @@
+%!TEX root = ../dokumentation.tex
+
+%
+% vorher in Konsole folgendes aufrufen:
+%	makeglossaries makeglossaries dokumentation.acn && makeglossaries dokumentation.glo
+%
+
+%
+% Glossareintraege --> referenz, name, beschreibung
+% Aufruf mit \gls{...}
+%
+
+%\newacronym{cd}{CD}{compact disk}
+
+\newglossaryentry{Glossareintrag}{name={Glossareintrag},plural={Glossareinträge},description={Ein Glossar beschreibt verschiedenste Dinge in kurzen Worten}}
+
+\newglossaryentry{computer}
+{
+    name=computer,
+        description={is a programmable machine that receives input,
+            stores and manipulates data, and provides
+                output in a useful format}
+}
+
+\newglossaryentry{potato}{name={potato},plural={potatoes},
+description={starchy tuber}}
+\newglossaryentry{cabbage}{name={cabbage},
+description={vegetable with thick green or purple leaves}}
+\newglossaryentry{carrot}{name={carrot},
+description={orange root}}
+
+%\newacronym{api}{API}{Application Programming Interface }
+
+%%% The glossary entry the acronym links to   
+\newglossaryentry{api}{name={API},
+    description={An Application Programming Interface (API) is a particular set
+    of rules and specifications that a software program can follow to access and
+    make use of the services and resources provided by another particular software
+    program that implements that API}}
+
+    %%% define the acronym and use the see= option
+    %\newglossaryentry{api}{type=\acronymtype, name={API}, description={Application
+    %Programming Interface}, first={Application
+    %Programming Interface (API)\glsadd{apig}}, see=[Glossary:]{apig}}
