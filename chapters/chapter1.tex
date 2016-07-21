@@ -1,17 +1,16 @@
 \chapter{Introduction\label{cha:chapter1}}
 
-There are things to be aware of when dealing with machine native code
-the instructions themselves do not retain any information about /concerning the abstractions in the
-original source code, because the CPU does not need it
+There are things to be aware of when dealing with \gls{native} code:
+\begin{itemize}
+    \item the instructions themselves do not retain any information about the abstractions of the source programming language in the
+original source code, because the CPU does not need them to run the program
 
-backend compiler passes
+%backend compiler passes
 %reorganize and reposition instructions
-furthermore, compiler optimizations can move, add and transform instructions in such a way that it might not be possible
-to identify which source code statement correpsond to a particular/specific set of machine instruction
+\item furthermore, compiler \glspl{optim} can move, add and transform \glspl{ir} in such a way that it might not be possible to identify which source code statement correpsond to a particular set of instructions
+\end{itemize}
 
-hence, compilation of a program to native code involve a huge loss of information
-information that is usually collected by compilers and bundled with binaries/object files in the form of
-debugging information for debuggers.
+hence, compilation of a program to native code involve a huge loss of information, information that is usually collected by compilers and bundled with binaries and \glspl{objectfile} in the form of debugging information for debuggers.
 
 \section{Motivation\label{sec:moti}}
 
@@ -65,15 +64,11 @@ for each, what effect is achieved, tradeoffs
 \\
 \textbf{Chapter \ref{cha:chapter4}} is usually termed 'Concept', 'Design' or 'Model'. Here you describe your approach, give a high-level description to the architectural structure and to the single components that your solution consists of. Use structured images and UML diagrams for explanation. This chapter will have a volume of 20-30 percent of your thesis.
 \\
-The OCaml native runtime
+The OCaml native runtime system
 LLDB (API)
 ocp(lib)-lldb (hl archi)
 
 additions to LLDB and ocp-lldb
-\\
-\textbf{Chapter \ref{cha:chapter5}} describes the implementation part of your work. Don't explain every code detail but emphasize important aspects of your implementation. This chapter will have a volume of 15-20 percent of your thesis.
-\\
-
 \\
 \textbf{Chapter \ref{cha:chapter6}} is usually termed 'Evaluation' or 'Validation'. How did you test it? In which environment? How does it scale? Measurements, tests, screenshots. This chapter will have a volume of 10-15 percent of your thesis.
 \\
@@ -81,6 +76,16 @@ How does it fare?
 \\
 \textbf{Chapter \ref{cha:chapter7}} summarizes the thesis, describes the problems that occurred and gives an outlook about future work. Should have about 4-6 pages.
 
-&& Améliorations
-&& Extensions
+Améliorations
+Work left to do
+
+Enhancements
+
+User experience/interface minor:
+- no function name symbol displayed in the backtrace
+- no proper stop at breakpoint set on a module's entry point (in disassembled code) rather than in source
+- global variables becomes available/displayed after second call to `frame variable`
+
+
+Extensions
 Work being done in same direction
