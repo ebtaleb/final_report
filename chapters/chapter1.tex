@@ -3,26 +3,35 @@
 There are things to be aware of when dealing with \gls{native} code:
 \begin{itemize}
     \item the instructions themselves do not retain any information about the abstractions of the source programming language in the
-original source code, because the CPU does not need them to run the program
+original source code, because the CPU does not need them to run the program,
 
 %backend compiler passes
 %reorganize and reposition instructions
-\item furthermore, compiler \glspl{optim} can move, add and transform \glspl{ir} in such a way that it might not be possible to identify which source code statement correpsond to a particular set of instructions
+\item furthermore, compiler \glspl{optim} can move, add and transform \glspl{ir} in such a way that it might not be possible to identify which source code statement correpsond to a particular set of instructions.
 \end{itemize}
 
-hence, compilation of a program to native code involve a huge loss of information, information that is usually collected by compilers and bundled with binaries and \glspl{objectfile} in the form of debugging information for debuggers.
+Hence, compilation of a program to native code involve a huge loss of information, information that is usually collected by compilers and bundled with binaries and \glspl{objectfile} in the form of debugging information for debuggers.
 
 \section{Motivation\label{sec:moti}}
 
-necessary to debug native code, in cases where a bug might appear only in a optimized binary/program
+There are three main reasons for this work :
+
+\begin{itemize}
+    \item Cases where it is necessary to debug native code may arise, e.g a bug appearing only in an optimized version of a program
+    \item
+\end{itemize}
+
 %(if inline assembly code is inserted manually by a developer e.g)
-easier to debug unoptimized, but inspecting assembly code instruction and memory becomes a tedious task in a large program
+It is usually easier to debug an unoptimized program,
 
-there is for now no lasting? comprehensive? definitive? solution for debugging OCaml native code
-partial effort was made, bare minimum is here (backtrace support, partial step by step into function entry points and function calls)
-
-no variable inspection, main debuggers unaware of the OCaml native runtime management of values
+\indent There is for now no unified solution for debugging OCaml native code on any platform.
+Some work was made, the bare minimum is here (\gls{backtrace} support, partial step by step into function entry points and function calls)
+\\
+\\
+\indent mainstream debuggers remain largely unaware of the OCaml native runtime % management of values
+no variable inspection,
 moslty assembly/ raw memory view, arcane knowledge of target architecture, not available to every developper
+but inspecting assembly code instruction and memory becomes a tedious task in a large program
 
 \section{Objectives\label{sec:objective}}
 The work presented here aims to address
@@ -32,6 +41,18 @@ Enhance the debugging experience
 diminish cognitive strain on devs
 
 targeting developers lacking knowledge of the target architecture
+
+\begin{algorithmic}[1]
+	\If{some condition is true}
+	\State do some processing
+	\ElsIf{some other condition is true}
+	\State do some different processing
+	\ElsIf{some even more bizarre condition is met}
+	\State do something else
+	\Else
+	\State do the default actions
+	\EndIf
+\end{algorithmic}
 
 \section{Scope\label{sec:scope}}
 
@@ -89,3 +110,6 @@ User experience/interface minor:
 
 Extensions
 Work being done in same direction
+
+TODO:
+We developed the first prototype of a native debugger for OCaml, based on the LLDB debugging framework on top of LLVM. For that, we first generated a full OCaml binding for the LLDB library, by parsing the C++ headers of the libraries and automatically generating OCaml and C++ stubs. We were then able to use the OCaml binding to develop several tools, ranging from a simple tool that displays the internal GC information of a finished OCaml application, to an almost complete debugger, which displays OCaml values using runtime type information added for memory profiling.

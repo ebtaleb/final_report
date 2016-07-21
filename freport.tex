@@ -16,6 +16,8 @@
 \usepackage{biblatex}
 \nocite{*}
 
+\usepackage{algpseudocode}
+
 \lstset{
     language=[Objective]Caml
 }
@@ -36,7 +38,7 @@
 \graphicspath{{./img/}}
 
 \makenoidxglossaries
-\input{./misc/glossary} 
+\input{./misc/glossary}
 
 \bibliography{./bib/references}
 
@@ -46,14 +48,14 @@
 \frontmatter
     \include{./misc/titlepage}
    	\thispagestyle{empty}
-    
+
     %\include{./misc/abstract}
     %\thispagestyle{empty}
     %\cleardoublepage
-    
+
     \tableofcontents
     \thispagestyle{empty}
-    
+
 % --------------------------------------------------------------
 \mainmatter % comment single chapters for faster compilation
     \input{./chapters/chapter1}
