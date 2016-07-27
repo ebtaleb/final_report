@@ -1,83 +1,121 @@
-\chapter{Fundamentals and Related Work\label{cha:chapter2}}
+\chapter{Introduction to the DWARF format}
 
-This section is intended to give an introduction about relevant terms, technologies and standards in the field of X. You do not have to explain common technologies such as HTML or XML. 
+To establish correspondence between high-level source code and low-level machine code, one wants to
+\begin{itemize}
+    \item  collect all information generated im the compiling process
+    \item  and represent that information in a suitable format usable by debuggers, concisely and compactly
+\end{itemize}
 
-\section{Technologies \label{sec:tech}}
+DWARF is a debugging data format allowing support for source level debugging
+it has with the following characteristics:
 
-This section describes relevant technologies, starting with X followed by Y, concluding with Z.
+It is widely used today
+it is language agnostic, independent of compiler tooling (linker/assembler),
+target architecture and debuggers.
+It is somewhat object file agnostic, although mostly associated with the ELF object file format.
 
-\subsection{Technology A\label{sec:aaa}}
+it is standardized, meaning it has specifications and norms codified into
+a formal document.
+A commitee oversees additions/extensions to the standard to follow the
+appearance of programming languages and their evolution
 
-It's always a good idea to explain a technology or a system with a citation of a prominent source, such as a widely accepted technical book or a famous person or organization. 
+\section{Important DWARF sections and their contents}
 
-Exmple: Tim-Berners-Lee describes the ''WorldWideWeb'' as follows:
-\\
-\textit{''The WorldWideWeb (W3) is a wide-area hypermedia information retrieval initiative aiming to give universal access to a large universe of documents.''} \cite{timwww}
-\\
-\\
-You can also cite different claims about the same term.
-\\
-According to Bill Gates \textit{''Windows 7 is the best operating system that has ever been released''} \cite{billgates} (no real quote)
-In opposite Steve Jobs claims Leopard to be \textit{''the one and only operating system''} \cite{stevejobs}
+\begin{description}
+    \item[.debug\_abbrev] Abbreviations used to decode the .debug\_info section
+    \item[.debug\_frame] Call frame information table
+    \item[.debug\_info] Core DWARF data section
+    \item[.debug\_line] Line number information table
+    \item[.debug\_loc] Location lists for runtime location of variables/parameters
+    \item[.debug\_str] String table reference in .debug\_info
+\end{description}
 
-If the topic you are talking about can be grouped into different categories you can start with a classification.
-Example: According to Tim Berners-Lee XYZ can be classified into three different groups, depending on foobar \cite{timwww}:
-	\begin{itemize}
-		\item Mobile X
-				\vspace{-0.1in} 
-		\item Fixed X
-				\vspace{-0.1in} 
-		\item Combined X
- 	\end{itemize}
+\section{Storage}
 
-\subsection{Technology B\label{sec:bbb}}
+The debugging information is stored in sections in the object file.
 
-For internal references use the 'ref' tag of LaTeX. Technology B is similar to Technology A as described in section \ref{sec:aaa}.
+In the separate compilation process, the DWARF sections of each object file are
+put together in their common corresponding section in the final binary
 
-\newpage
+Binary data format
 
-\subsection{Comparison of Technologies\label{sec:comp}}
+Multiple techniques are used to reduce the size of the debugging information:
 
-\begin{table}[htb]
-\centering
-\begin{tabular}[t]{|l|l|l|l|}
-\hline
-Name & Vendor & Release Year & Platform \\
-\hline
-\hline
-A & Microsoft & 2000 & Windows \\
-\hline
-B & Yahoo! & 2003 & Windows, Mac OS \\
-\hline
-C & Apple & 2005 & Mac OS \\
-\hline
-D & Google & 2005 & Windows, Linux, Mac OS \\
-\hline
-\end{tabular}
-\caption{Comparison of technologies}
-\label{tab:enghistory}
-\end{table}
+LEB128 is a variable length compression encoding
+it allows for encoding of signed and unsigned integers of arbitrary size.
+Used in DWARF to encode values of various fields (like attributes)
 
-\section{Standardization \label{sec:standard}}
+Some of the section tables can become quite large.
+In order to save space, those tables are encoded as bytecode instructions to be executed by state machines to obtain their fully expanded form
 
-This sections outlines standardization approaches regarding X.
+\section{Structure}
 
-\subsection{Internet Engineering Task Force\label{sec:itu}}
+\subsection{Debugging information entry}
 
-The IETF defines SIP as '...' \cite{rfcsip}
+In DWARF, the base entity manipulated is called an debugging information entry, or DIE.
+A DIE is made of a tag specifying what language construct it describes and a list of attributes giving more details concerning that construct.
 
-\subsection{International Telecommunication Union\label{sec:itu}}
+A DIE tag can designate for example entities such as:
+\begin{description}
+    \item[DW\_TAG\_subprogram] — A subroutine/function
+    \item[DW\_TAG\_variable] — A variable
+    \item[DW\_TAG\_formal\_parameter] — An argument within function parameters
+    \item[DW\_TAG\_lexical\_block] - Define lexical scoping of local variables
+    \item[DW\_TAG\_base\_type] - Primitive type not defined in terms of other
+        types
+\end{description}
 
-Lorem Ipsum...
+An attribute is a name/value couple.
+The name attribute indicates what the value represents (name, absolute address,
+bytecode, offset, string, integer) and what class of values are supported
+It is hence possible for attributes values to reference other DIEs and DWARF sections.
 
-\subsection{3GPP\label{sec:3gpp}}
+\begin{description}
+    \item[DW\_AT\_name] String naming the designated DIE
+    \item[DW\_AT\_stmt\_list] Offset referencing a location list
+    \item[DW\_AT\_type] Reference to a type DIE
+    \item[DW\_AT\_low\_pc] address of the first machine instruction
+    \item[DW\_AT\_high\_pc] address or offset/constant of the first location past the last instruction
+\end{description}
 
-Lorem Ipsum...
+A DIE can be nested in another parent DIE, have siblings and children,
+can be represented as a tree with an arbitrary number of children
 
-\subsection{Open Mobile Alliance\label{sec:oma}}
+The subprogram DIE owns DIEs describing the subprogram.
 
-Lorem Ipsum...
+\subsection{Compilation unit}
 
-\section{Concurrent Approaches \label{sec:summ}}
+It designates two entities :
 
-There are lots of people who tried to implement Component X. The most relevant are ...
+each separately compiled source file is considered as a compilation unit
+the root of a DIE tree that starts the DWARF data for the source file it represents
+It contains general information about the compilation,
+such as the programming language, the compiler version used, source file name, flags
+
+\section{Example}
+
+\section{The ocplib-dwarf library}
+
+it is a library written in OCaml that reads and prints DWARF data in a human readable format similar to objdump
+made in a effort to learn and comprehend the DWARF format during the internship.
+
+DWARF emission writing and editing features are not yet implemented
+not sure it is useful, as this task is left to compilers
+
+high level desc
+
+%todo prepare a schema
+
+driver with command line option handling
+
+offers abstraction that allow DWARF data manipulation
+can visualize the DIE tree structure in debug\_info in DOT format using graphviz
+to emulate mutable trees, a zipper library was implemented
+
+utility functions for reading binary data
+
+section parsing implemented accordingly to the DWARF4 standard by its own module
+printing module operates on DWARF data structures in ocaml
+
+hexadecimal view available for debugging purposes
+

@@ -1,3 +1,7 @@
+TODO:
+We developed the first prototype of a native debugger for OCaml, based on the LLDB debugging framework on top of LLVM. For that, we first generated a full OCaml binding for the LLDB library, by parsing the C++ headers of the libraries and automatically generating OCaml and C++ stubs. We were then able to use the OCaml binding to develop several tools, ranging from a simple tool that displays the internal GC information of a finished OCaml application, to an almost complete debugger, which displays OCaml values using runtime type information added for memory profiling.
+
+
 \chapter{Concept\label{cha:chapter4}}
 This chapter introduces the architectural design of Component X. The component consists of subcomponent A, B and C.
 

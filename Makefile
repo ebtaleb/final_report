@@ -1,8 +1,12 @@
 # to refresh the glossary must run pdflatex twice
+
+TEX=pdflatex
+TEXFLAGS=-file-line-error -interaction=nonstopmode
+
 freport: freport.tex
-	pdflatex $^
+	$(TEX) $(TEXFLAGS) $^
 	biber $@
-	pdflatex $^
+	$(TEX) $(TEXFLAGS) $^
 
 .PHONY: clean
 
