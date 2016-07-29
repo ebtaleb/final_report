@@ -1,30 +1,70 @@
-, what/why/how
-The OCaml language?
+\chapter{The OCaml native compiler}
+
+The OCaml language support multiple programming paradigms
+
+functional programming style, pure computations, math functions (always evals to same value acr
+different executions for same args),
+
+in contrast, imperative programming can change directly state of the prog,
+resulting in side effects where return value of a routine may change acr mult
+execution
+
+stepping through function call is fine, regardless of whether they are pure or
+not
+support assignments and mutable variables
+
+map filter, first class functions taking other functions as arguments, partial
+application it may not make much sense to debug this the same way one would with
+an imperative language such as C
+
+\section{Compilation process}
+
 The OCaml native toolchain
-hl architecture, compilation process
 
-debug loc
-dwarf - available\_regs/ranges
-types
-for each, what effect is achieved, tradeoffs
+ocamlc Bytecode version of the bytecode compiler
+ocamlc.opt Native code version of the bytecode compiler
+ocamlopt Bytecode version of the native compiler
+ocamlopt.opt Native code version of the native compiler
 
+the source program goes though multiple passes/transformations
 
-\chapter{Requirements\label{cha:chapter3}}
-This section determines the requirements necessary for X. This includes the functional aspects, namely Y and Z, and the non functional aspects such as A and B.
+among those steps, all passes up to lambda are common to both bytecode and
+native compilers, the next ones are specific to the native compiler
 
-\section{Overview\label{sec:reqoverview}}
+lexing / lexical analysis
+split the program from a sequence of characters into a sequence of tokens
 
-In this chapter you will describe the requirements for your component. Try to group the requirements into subsections such as 'technical requirements', 'functional requirements', 'social requirements' or something like this. If your component consist of different partial components you can also group the requirements for the corresponding parts.
+parsetree / syntactic analysis - parsing
 
-Explain the source of the requirements.
+check whether the program as a seq of tokens is gramatically valid, and if so
+construct a base in-memory representation of the program, an abstract syntax
+tree
+contain file and line location information
 
-Example: The requirements for an X have been widely investigated by Organization Y.
+typedtree - typing - semantic analysis
+annotate AST with type information
+type inference, pattern matching analysis?
 
-In his paper about Z, Mister X outlines the following requirements for a Component X.
+lambda
+AST with pattern matching compilation to if and switch constructs
+loss of most of location information, except for debugging purposes
 
-\section{Technical Requirements\label{sec:techreq}}
+clambda
+closure conversion, inlining, constant propagation
 
-The following subsection outlines the technical requirements to Component X.
+cmm
+primitives conversion, constant folding
+
+mach
+register liveness analysis, register allocation
+
+linearize
+code as list/seq of pseudo-instructions, close to machine code
+with calls and jumps
+
+codegen
+
+% todo : make figure with all different compilation steps
 
 \begin{algorithmic}[1]
 	\If{some condition is true}
@@ -38,21 +78,60 @@ The following subsection outlines the technical requirements to Component X.
 	\EndIf
 \end{algorithmic}
 
-\subsection{Sub-component A\label{sec:reqsuba}}
+\section{Additions to the compiler}
 
-\textbf{Interoperability}
-\\
-Lorem Ipsum...
-\\
-\\
-\textbf{Scalability}
-\\
-Lorem Ipsum...
+Concerning the modifications done to the native compiler
 
-\subsection{Sub-component B\label{sec:reqsubb}}
+scope limiting to x86 64-bits systems using Linux
+closed project fork of the ocaml compiler,
+including memory profiling facilities
 
-Lorem Ipsum...
+libraries in compilerlibs allows use of the lexer and parser facilities, esp
+useful when operating over parsetree/typedtree representation
 
-\section{Social Requirements\label{sec:socreq}}
+used to build symbol table mapping identifiers in the prog to their type
+for runtime value interpretation
 
-Component X must compete with Y. Hence, it is required to provide an excellent usability. This includes ...
+\subsection{Location information}
+
+Definition of debugging events
+
+from the ocaml manual
+%http://caml.inria.fr/pub/docs/manual-ocaml-4.02-1/debugger.html#sec350
+
+Events are “interesting” locations in the source code, corresponding to the beginning or end of evaluation of “interesting” sub-expressions. Events are the unit of single-stepping (stepping goes to the next or previous event encountered in the program execution). Also, breakpoints can only be set at events. Thus, events play the role of line numbers in debuggers for conventional languages.
+
+those events are here used in the bytecode with the bytecode, source-level debugger ocamldebug
+
+it was stated previously that among the debugging information to be added, line
+information is important, both for stepping into the source program statement by
+statement, but also for setting breakpoints by file and line number
+
+the idea here is to propagate the location information contained in those events
+through the native code backend
+
+by wrapping all AST/IR nodes into a struct containing the node and a field with
+location information from the debugging event
+
+this has been done for every native backend pass all the way up to linearize (that already
+contains such a field)
+
+then attached location information to some nodes/constructs in particular
+
+integers - as empty lists, None represented as integer 1/0
+setfield primitive - responsible for mut assignments
+pro cons
+
+\subsection{Runtime location of variables}
+
+dwarf - available\_regs/ranges
+types
+for each, what effect is achieved, tradeoffs
+what/why/how
+
+\subsection{DWARF emitter}
+
+\subsection{Type information}
+
+
+
