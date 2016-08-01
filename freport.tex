@@ -19,6 +19,7 @@
 \usepackage{algpseudocode}
 
 \lstset{
+    frame=single,
     language=[Objective]Caml
 }
 
@@ -32,6 +33,12 @@
     urlcolor={blue!80!black}
 }
 
+\usepackage{enumitem}
+\usepackage{calc}
+\SetLabelAlign{parright}{\parbox[t]{\labelwidth}{\raggedleft#1}}
+
+\usepackage{amssymb}
+
 % header and footer line - no header & footer line on pages where a new chapter starts
 \pagestyle{scrheadings}
 
@@ -42,10 +49,21 @@
 
 \bibliography{./bib/references}
 
-\begin{document}
+\usepackage{pifont}
 
-\newcommand\pro{\item[$+$]}
-\newcommand\con{\item[$-$]}
+\newcommand*\tick{\item[\ding{51}]}
+\newcommand*\fail{\item[\ding{55}]}
+
+\newcommand*\pro{\item[$+$]}
+\newcommand*\con{\item[$-$]}
+
+\newcommand*\BitAnd{\mathrel{\&}}
+\newcommand*\BitOr{\mathrel{|}}
+\newcommand*\ShiftLeft{\ll}
+\newcommand*\ShiftRight{\gg}
+\newcommand*\BitNeg{\ensuremath{\mathord{\sim}}}
+
+\begin{document}
 
 % ---------------------------------------------------------------
 \frontmatter

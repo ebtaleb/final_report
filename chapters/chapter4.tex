@@ -1,6 +1,14 @@
-\chapter{Interfacing with LLDB}
+\chapter{Interfacing with LLDB\label{cha:chapter4}}
+
+%todo refactor
 
 We developed the first prototype of a native debugger for OCaml, based on the LLDB debugging framework on top of LLVM. For that, we first generated a full OCaml binding for the LLDB library, by parsing the C++ headers of the libraries and automatically generating OCaml and C++ stubs. We were then able to use the OCaml binding to develop several tools, ranging from a simple tool that displays the internal GC information of a finished OCaml application, to an almost complete debugger, which displays OCaml values using runtime type information added for memory profiling.
+
+The OCaml native runtime system
+LLDB (API)
+ocp(lib)-lldb (hl archi)
+
+additions to LLDB and ocp-lldb
 
 \section{Sub-component A\label{sec:conceptsuba}}
 The concept chapter provides a high-level explanation of your solution. Try to explain the overall structure with a picture. You can also use UML sequence diagrams for explanation.
@@ -14,23 +22,100 @@ Figure \ref{fig:aliceandbob} illustrates the situation between Alice and Bob. (s
   \label{fig:aliceandbob}
 \end{figure}
 
-\section{Sub-component B\label{sec:conceptsubb}}
+\subsection{LLDB OCaml language plugin}
 
-Lorem Ipsum...
+at this point, a OCaml program compiled with a compiler and modifications
+presented previously contains more information relevant to debugging than before
 
-\section{Proposed API\label{sec:conceptsubb}}
+more places where to set a breakpoint in the program
+runtime location of variables
+type information
 
-Lorem Ipsum...
+however, the information provided by 2 and 3 cannot be used directly as it is yet:
+using LLDB directly
 
-\section{Layer X\label{sec:conceptlayerx}}
 
-Lorem Ipsum...
+current versions of LLDB arent aware of OCaml
+Ocaml binary mixing C with OCaml assembly code
+LLDB bindings doesnt allow access to the DWARF data nor name symbol demangling
 
-\section{Interworking of X and Y\label{sec:conceptinter}}
+however, it is now possible for LLDb to support other languages/ debug binaries
+written in different programming languages
+% depuis un peu moins d'un an, chgmts faits a LLDB pour pouvoir supporter d'autres languages que ceux supportes par clang
+% il suffit d'ecrire des classes impl certaines interfaces
+% ajouter le language cible dans un enum
 
-Lorem Ipsum...
+% eventuellement pouvoir evaluer expr dans ce language
+% pretty printing des valeurs et typage dynamique, ptes statiques ou dyn du language
+facilities for evaluating language expressions
+express static dynamic properties of the language
 
-\section{Interface Specification\label{sec:intspec}}
+among the addition done to LLDB
 
-Lorem Ipsum...
+custom DWARF parser
 
+minimal type system, data structures used to represent OCaml types may
+    change from one version to another, it might not be maintainable to update
+    the LLDB plugin at each release
+    backwards compatibility concerns
+    thus, all values are to be considered as 64-bits integers, and their
+    interpretation according to their types will be left to ocp-lldb
+
+    does symbol demangling as well
+
+    mangled ocaml symbol of the form
+    make demangled form available for easier breakpoint setting
+
+
+\subsection{ocp-lldb}
+
+ocplib-lldb \\
+
+taking advantage of the OCaml compiler frontend as a library
+allowing use of the lexer and parser and typing facilities, esp
+useful when operating over parsetree/typedtree representation
+
+used to build symbol table mapping identifiers in the prog to their type
+for runtime value interpretation
+
+can generate an OCaml binding to LLDB API
+
+parse header files in LLDB
+most classes and methods of the API are supported, except static methods
+access to C++ objects done through the OCaml FFI C interface
+
+ocp-lldb
+
+symbol table management :
+read the serialized typed AST, iterate over it to extract a simpler tree
+structure
+then one can actually lookup the type associated with an identifier and display
+its value accordingly
+
+\section{Runtime memory representation of OCaml values}
+
+\Glspl{boxed} are represented as a pointer to a block structure, made of a
+header followed by data
+header contains size of the block, and tag describing what type of data it
+contains
+add level of indirection / deref
+
+to differentiate between pointers and integer values at runtime, the runtime
+system uses a tagged pointer representation, the least significant bit of a
+value is used as a tag : an OCaml integer is encoded as a 31 or 63-bit machine integer = $ (x \ShiftLeft 1) \BitOr 1 $
+represented as 31/63-bit
+
+integers of type int are not boxed, this bit will be set to one
+pointers are word-aligned, this bit is always set to zero
+(all pointers will be divisible by 4, which means they will always end with two
+0 bits)
+
+int, char are unboxed
+unit, false, empty list [] as 0
+true as 1
+
+arrays, records, tuples -> header + array of values
+records with floats fields, array of floats -> header + array of floats
+
+variant types -> variants without paramter are unboxed ascending ints, non
+constants variants with parameters are boxed

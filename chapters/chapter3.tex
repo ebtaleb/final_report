@@ -1,137 +1,226 @@
-\chapter{The OCaml native compiler}
+\chapter{The OCaml native compiler\label{cha:chapter3}}
 
-The OCaml language support multiple programming paradigms
+The OCaml language support multiple programming paradigms:
 
-functional programming style, pure computations, math functions (always evals to same value acr
-different executions for same args),
+functional programming style, that consists mostly of pure computations that always
+evaluate to the same value across different executions for the same arguments
+and do not produce side effects.
 
-in contrast, imperative programming can change directly state of the prog,
-resulting in side effects where return value of a routine may change acr mult
-execution
+in contrast, in the imperative programming style
+use of assignments to mutable variables can result in side effects
+where the return value of a routine may change across multiple executions,
+mutate/modifie some state in the program, perform I/O operations
+such as reading from/writing to a file
 
-stepping through function call is fine, regardless of whether they are pure or
-not
-support assignments and mutable variables
+In both styles, stepping through function calls is fine, regardless of whether
+they are pure or not.
+However, in the case of side-effect functions, one must be vary of the order of
+evaluation of arguments, as they may affect the return value.
 
-map filter, first class functions taking other functions as arguments, partial
-application it may not make much sense to debug this the same way one would with
-an imperative language such as C
+Moreover, constructs specific to functional programming style such as the map
+and filter functions, the use of first class functions taking other functions as
+arguments and partial function application/currying,
+it may not make much sense to debug this the same way one would with
+an imperative language such as C and its equivalent constructs.
 
 \section{Compilation process}
 
-The OCaml native toolchain
+The source program goes through multiple passes/transformations:
 
-ocamlc Bytecode version of the bytecode compiler
-ocamlc.opt Native code version of the bytecode compiler
-ocamlopt Bytecode version of the native compiler
-ocamlopt.opt Native code version of the native compiler
+\begin{description}
+    \item[lexing - lexical analysis]
+        split the program from a sequence of characters into a sequence of tokens
 
-the source program goes though multiple passes/transformations
+    \item[parsetree - syntactic analysis]
 
-among those steps, all passes up to lambda are common to both bytecode and
-native compilers, the next ones are specific to the native compiler
+        check whether the program as a seq of tokens is gramatically valid, and if so
+        construct a base in-memory representation of the program, an abstract syntax
+        tree. that AST contains file and line location information.
 
-lexing / lexical analysis
-split the program from a sequence of characters into a sequence of tokens
+    \item[typedtree - semantic analysis]
+        annotate AST with type information
+        type inference and checking
 
-parsetree / syntactic analysis - parsing
+    \item[lambda]
+        AST with
+        pattern matching optimization,
+        % to if and switch constructs,
+        elimination of classes and modules,
+        discards type information,
+        maps the source code to runtime memory model,
+        gives unique names to identifiers by append number to them
+        (variable shadowing)
+        loss of most of location information occurs at this point
 
-check whether the program as a seq of tokens is gramatically valid, and if so
-construct a base in-memory representation of the program, an abstract syntax
-tree
-contain file and line location information
+    \item[clambda]
+        closure conversion, inlining, constant propagation/folding
 
-typedtree - typing - semantic analysis
-annotate AST with type information
-type inference, pattern matching analysis?
+    \item[cmm]
+        primitives conversion, constant folding
 
-lambda
-AST with pattern matching compilation to if and switch constructs
-loss of most of location information, except for debugging purposes
+    \item[mach]
+        register liveness analysis, register allocation
 
-clambda
-closure conversion, inlining, constant propagation
+    \item[linearize]
+        code as list/seq of pseudo-instructions, close to machine code
+        with calls and jumps
 
-cmm
-primitives conversion, constant folding
+    \item[code generation]
 
-mach
-register liveness analysis, register allocation
+    \item[assembling and linking]
+\end{description}
 
-linearize
-code as list/seq of pseudo-instructions, close to machine code
-with calls and jumps
-
-codegen
+Among those steps, all passes up to lambda are common to both bytecode and
+native compilers, the ones from clambda onwards are specific to the native compiler
 
 % todo : make figure with all different compilation steps
 
-\begin{algorithmic}[1]
-	\If{some condition is true}
-	\State do some processing
-	\ElsIf{some other condition is true}
-	\State do some different processing
-	\ElsIf{some even more bizarre condition is met}
-	\State do something else
-	\Else
-	\State do the default actions
-	\EndIf
-\end{algorithmic}
 
 \section{Additions to the compiler}
 
-Concerning the modifications done to the native compiler
-
-scope limiting to x86 64-bits systems using Linux
-closed project fork of the ocaml compiler,
-including memory profiling facilities
-
-libraries in compilerlibs allows use of the lexer and parser facilities, esp
-useful when operating over parsetree/typedtree representation
-
-used to build symbol table mapping identifiers in the prog to their type
-for runtime value interpretation
+Those additions were done and tested on a x86 64-bit system using Linux, on a
+closed project fork of the OCaml compiler, including memory profiling
+facilities.
 
 \subsection{Location information}
 
-Definition of debugging events
+Let us define first what a debugging event is, quoting the OCaml manual:
 
-from the ocaml manual
-%http://caml.inria.fr/pub/docs/manual-ocaml-4.02-1/debugger.html#sec350
+\begin{quotation}
+    Events are “interesting” locations in the source code, corresponding to the
+    beginning or end of evaluation of “interesting” sub-expressions. Events are
+    the unit of single-stepping (stepping goes to the next or previous event
+    encountered in the program execution). Also, breakpoints can only be set at
+    events. Thus, events play the role of line numbers in debuggers for
+    conventional languages. \autocite{events}
+\end{quotation}
 
-Events are “interesting” locations in the source code, corresponding to the beginning or end of evaluation of “interesting” sub-expressions. Events are the unit of single-stepping (stepping goes to the next or previous event encountered in the program execution). Also, breakpoints can only be set at events. Thus, events play the role of line numbers in debuggers for conventional languages.
+Those events are here used in the bytecode with the bytecode, source-level
+debugger \textit{ocamldebug}. \\
 
-those events are here used in the bytecode with the bytecode, source-level debugger ocamldebug
+Among the debugging information to be added, line information is important,
+both for stepping into the source program statement by statement,
+and also for setting breakpoints by file and line number.
 
-it was stated previously that among the debugging information to be added, line
-information is important, both for stepping into the source program statement by
-statement, but also for setting breakpoints by file and line number
+The idea here is to propagate the location information contained in those events
+through the native code backend, by wrapping all AST/IR nodes into a record
+containing the node and a field with location information from the debugging
+event.
 
-the idea here is to propagate the location information contained in those events
-through the native code backend
+\begin{lstlisting}
+type t = {
+  dinfo_file: string;
+  dinfo_line: int;
+  dinfo_char_start: int;
+  dinfo_char_end: int
+}
 
-by wrapping all AST/IR nodes into a struct containing the node and a field with
-location information from the debugging event
+type 'a expression = {
+  exp: 'a;
+  dbg: t;
+}
+\end{lstlisting}
 
-this has been done for every native backend pass all the way up to linearize (that already
-contains such a field)
+This has been done for every native backend pass all the way up to the linearize
+pass, whose instruction record that already contains such a field
 
-then attached location information to some nodes/constructs in particular
+% dans le code assembleur, présence de directives .loc
+%fichier - num de ligne - num de colonne
+%assembleur recupere les infos et l'offset et encode tout cela dans une structure dediée dans la section .debug\_line
 
-integers - as empty lists, None represented as integer 1/0
-setfield primitive - responsible for mut assignments
-pro cons
+Then/afterwards, location information was attached to some particular nodes/constructs
+
+integers - as empty list [] and None from the option type represented as integers
+primitives - explain what a primitive is, what it is responsible for
+
+prim operations mirroring bytecode instructions maybe?
+may refer to external C function
+assignments, allocation, comparisons, /string/float/integer/boolean operations,
+boxed/unboxed
+
+setfield primitive - responsible for mutable assignments
+
+\begin{description}
+\pro more info
+\con less precision
+\end{description}
+
+\begin{itemize}
+\tick more info
+\fail less precision
+\end{itemize}
+
+\begin{enumerate}
+\item Modifications lourdes du compilateur
+% languages des passes backend natif n'a pas prevu pour l'adjonction d'info de debug
+\item Manque de précision, perte d'informations
+% code subit encore des transformations/optimisations, est expansé puis réduit
+\item Valeurs disponibles pas toujours cohérentes
+% csq du manque de precision
+\end{enumerate}
 
 \subsection{Runtime location of variables}
 
-dwarf - available\_regs/ranges
-types
+available\_regs/ranges
+
+Add 2 passes into the backend: available\_regs and available\_ranges
+using forward data-flow analysis
+
+% todo dfa equations and pseudo code
+\[
+    %\begin{cases}
+    \textit{out}_{b} = \bigcup_{s \in succ_{b}} \textit{in}_{s} \\\\
+    \textit{in}_{b} = (\textit{out}_{b} - \textit{kill}_{b}) \cup \textit{gen}_{b}
+    %\end{cases}
+\]
+
+%out(b) = 0
+%for s in succ(b)
+  %out(b) = out(b) or in(s)
+  %in(b) = (out(b) and not kill(b)) or gen(b)
+
+% available\_regs parcourt le CFG Mach d'une fonction et determine pour chaque ins manip  l'ens des regs avec un ident "disponibles",
+%cad dont la valeur peut etre inspectee par un debuggeur
+% available_ranges determine pour chaque variable/identifieur d'une fonction les intervalles ou son contenu est disponible,
+% et pour chaque intervalle, le registre qui contient cette valeur
+
+\begin{algorithmic}[1]
+    \If{some condition is true}
+    \State do some processing
+    \ElsIf{some other condition is true}
+    \State do some different processing
+    \ElsIf{some even more bizarre condition is met}
+    \State do something else
+    \Else
+    \State do the default actions
+    \EndIf
+\end{algorithmic}
+
+populate the  .debug\_info et .debug\_loc sections
+
+unique identifier with unique stamp is generated in cases variable shadowing overwrites former value
+
+not every value binding is captured becaused of constant folding
+
+
 for each, what effect is achieved, tradeoffs
 what/why/how
 
 \subsection{DWARF emitter}
 
+for each, what effect is achieved, tradeoffs
+what/why/how
+
 \subsection{Type information}
 
 
+typed AST is serialized into the binary instead of a separate file
+
+more practical to manipulate, comes at the cost of a bigger binary size
+
+representation will be used later to build a symbol table for use in ocp-lldb
+
+
+for each, what effect is achieved, tradeoffs
+what/why/how
 

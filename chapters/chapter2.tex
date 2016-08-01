@@ -1,4 +1,4 @@
-\chapter{Introduction to the DWARF format}
+\chapter{Introduction to the DWARF format\label{cha:chapter2}}
 
 To establish correspondence between high-level source code and low-level machine code, one wants to
 \begin{itemize}
@@ -21,7 +21,8 @@ appearance of programming languages and their evolution
 
 \section{Important DWARF sections and their contents}
 
-\begin{description}
+%\begin{description}[leftmargin=!,labelwidth=\widthof{\bfseries .debug\_abbrev}]
+\begin{description}[labelwidth=\widthof{\bfseries .debug\_abbrev},align=parright]
     \item[.debug\_abbrev] Abbreviations used to decode the .debug\_info section
     \item[.debug\_frame] Call frame information table
     \item[.debug\_info] Core DWARF data section

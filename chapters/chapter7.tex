@@ -5,7 +5,6 @@ Enhancements
 
 User experience/interface minor:
 - no function name symbol displayed in the backtrace
-- no proper stop at breakpoint set on a module's entry point (in disassembled code) rather than in source
 - global variables becomes available/displayed after second call to `frame variable`
 
 Extensions
@@ -50,5 +49,23 @@ Industry projects, EU projects, open source...? Is it integrated into a larger e
 Summarize the main problems. How did you solve them? Why didn't you solve them?
 
 \section{Outlook\label{sec:outlook}}
+%\item Systèmes visés: Linux x86 64 bits
+%\item Plupart des outils encore non disponible au public
+% en particulier le fork du compilateur avec support pour profiling memoire
+% devrait etre mis a disposition au public dans un futur plus ou moins proche
+Emission DWARF \autocite{libmond} \autocite{dwpr}
+%de MS et deboguage natif: peut etre pour 4.05
+% amelioration faites depuis 4.02 concernent surtout flambda et gdb
+%\item Plugin LLDB OCaml et ocp-dwarf peuvent être rendus disponible
+% pour peu que la PR soit soumise
+% mais modifications moins maintenables et touchant plus au debugger lui meme que le plugin
+% compilateur reste a reste modifie en consequence
+%\item ocp-lldb déjà disponible
+%mais necessite fork avec memprof
+%la branche sur laquelle je travaille necessite un autre fork encore avec mes ajouts
 
-Future work will enhance Component X with new services and features that can be used ...
+% Challenges et difficultes
+%\item Augmenter le nombre de dbg events/locations
+% chronophage car precision de methode naive + temps de compilation de la compiler suite
+% comment faire composer les differents constructs ensemble
+% Modifications entre debugger et compiler
