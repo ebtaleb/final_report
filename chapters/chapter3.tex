@@ -122,7 +122,22 @@ type 'a expression = {
 \end{lstlisting}
 
 This has been done for every native backend pass all the way up to the linearize
-pass, whose instruction record that already contains such a field
+pass, whose instruction record that already contains such a field.
+
+At the code generation step, the code emitter uses two notable debugging
+assembly directives, specific to the GNU assembler as it is used in the
+compilation process:
+
+%https://sourceware.org/binutils/docs-2.26/as/Loc.html
+%https://sourceware.org/binutils/docs-2.26/as/File.html
+
+\begin{itemize}
+    \item .file fileno filename : assigning a positive integer to a filename
+    \item .loc fileno lineno [column] [options] : add a row to the .debug\_line
+        line information matrix for the current compilation unit, map a source
+        file and line number to the assembly instructions that follow
+
+\end{itemize}
 
 % dans le code assembleur, présence de directives .loc
 %fichier - num de ligne - num de colonne
@@ -150,28 +165,37 @@ setfield primitive - responsible for mutable assignments
 \fail less precision
 \end{itemize}
 
-\begin{enumerate}
-\item Modifications lourdes du compilateur
+Heavy modifications on the backend
+% huge patch when trying to add a debugging field to every IR node
 % languages des passes backend natif n'a pas prevu pour l'adjonction d'info de debug
-\item Manque de précision, perte d'informations
-% code subit encore des transformations/optimisations, est expansé puis réduit
-\item Valeurs disponibles pas toujours cohérentes
+lack of accuracy, loss of information still occuring as code is still expanded and transformed
+%\item Valeurs disponibles pas toujours cohérentes
 % csq du manque de precision
-\end{enumerate}
+as a csq of lack of precision, location information directives arent put at the
+most suitable assembly instruction, values might not be updated when they should
+and vice versa
 
 \subsection{Runtime location of variables}
+
+operating over the mach IR AST
+somewhat can be traversed like a CFG with branches
 
 available\_regs/ranges
 
 Add 2 passes into the backend: available\_regs and available\_ranges
-using forward data-flow analysis
+using forward data-flow analysis operating on Mach IR AST, can be traversed like
+a CFG
+
+passes takes a function expressed in Mach code as input
+return Mach code with each ins annotated with set of `registers` identifiers
+whose value can be accessed (hence available) by a debugger at runtime
 
 % todo dfa equations and pseudo code
 \[
-    %\begin{cases}
-    \textit{out}_{b} = \bigcup_{s \in succ_{b}} \textit{in}_{s} \\\\
+    \textit{out}_{b} = \bigcup_{s \in succ_{b}} \textit{in}_{s}
+\]
+\[
     \textit{in}_{b} = (\textit{out}_{b} - \textit{kill}_{b}) \cup \textit{gen}_{b}
-    %\end{cases}
 \]
 
 %out(b) = 0
