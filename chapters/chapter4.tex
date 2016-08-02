@@ -12,7 +12,7 @@ additions to LLDB and ocp-lldb
 
 \section{Introduction to LLDB}
 
-LLDB\autocite{}
+LLDB\autocite{lldb}
 aims to be a modern source-level debugger, modular plug-in arch (for obj file
 format, prog lang support, symbol files, disasm, specific hosts/targets), reusable components, public
 C++ API interface to library for access to and control of debugger instances,
@@ -82,12 +82,37 @@ minimal type system, data structures used to represent OCaml types may
 
 %todo ocp-lldb architecture
 
-\begin{figure}[htb]
+
+\begin{figure}
   \centering
-  \includegraphics[width=9cm]{uml_seq_example.png}\\
-  \caption{Alice and Bob}
-  \label{fig:aliceandbob}
+\begin{tikzpicture}[node distance=3pt,outer sep=0pt,
+blueb/.style={
+  draw=white,
+  fill=mybluei,
+  rounded corners,
+  text width=2.5cm,
+  font={\sffamily\bfseries\color{white}},
+  align=center,
+  text height=12pt,
+  text depth=9pt},
+greenb/.style={blueb,fill=mygreen},
+]
+\node[blueb] (ocl) {ocp-lldb};
+%\node[blueb,right=of RCP] (Aut) {Authoring};
+%\node[blueb,right=of Aut] (Bro) {Browsing};
+\node[blueb,below=of ocl] (ocll) {ocplib-lldb};
+\node[blueb,below=of ocll] (lldb) {liblldb};
+\node[blueb,fill=mypink,below=of lldb] (bin) {OCaml binary};
+\node[left=of bin] (asrs) {Output};
+\end{tikzpicture}
 \end{figure}
+
+%\begin{figure}[htb]
+  %\centering
+  %\includegraphics[width=9cm]{uml_seq_example.png}\\
+  %\caption{Alice and Bob}
+  %\label{fig:aliceandbob}
+%\end{figure}
 
 ocplib-lldb \\
 
@@ -114,21 +139,22 @@ its value accordingly
 
 \section{Runtime memory representation of OCaml values}
 
-\Glspl{boxed} are represented as a pointer to a block structure, made of a
-header followed by data
-header contains size of the block, and tag describing what type of data it
-contains
-add level of indirection / deref
+all values represented as a single word (of either 32 or 64 bits)
 
 to differentiate between pointers and integer values at runtime, the runtime
 system uses a tagged pointer representation, the least significant bit of a
-value is used as a tag : an OCaml integer is encoded as a 31 or 63-bit machine integer = $ (x \ShiftLeft 1) \BitOr 1 $
-represented as 31/63-bit
+value is used as a tag : an OCaml integer is encoded as a 31 or 63-bit integer = $ (x \ShiftLeft 1) \BitOr 1 $
 
-integers of type int are not boxed, this bit will be set to one
-pointers are word-aligned, this bit is always set to zero
-(all pointers will be divisible by 4, which means they will always end with two
-0 bits)
+mere integers are not boxed, the tag bit will be set to one
+as for pointers, since they are word-aligned, their tag bit will be set to zero
+(they are multiples of 4, therefore they will always end with two 0 bits)
+
+\Glspl{boxed} are represented as a single word pointer to a block structure, made of a
+header followed by data
+The header contains metadata about the value such as size of the block, and tag describing what type of data it
+contains
+add level of indirection / deref
+
 
 int, char are unboxed
 unit, false, empty list [] as 0

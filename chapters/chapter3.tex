@@ -25,6 +25,38 @@ an imperative language such as C and its equivalent constructs.
 
 \section{Compilation process}
 
+\begin{figure}
+  \centering
+\begin{tikzpicture}[node distance=3pt,outer sep=0pt,
+blueb/.style={
+  draw=white,
+  fill=mybluei,
+  rounded corners,
+  text width=2.5cm,
+  %font=\scriptsize,
+  font={\scriptsize\sffamily\bfseries\color{white}},
+  align=center,
+  text height=12pt,
+  text depth=9pt},
+greenb/.style={blueb,fill=mygreen},
+]
+\node[blueb, fill=mygreen] (prog) {OCaml source file};
+\node[left=of prog] (i) {Input};
+\node[blueb, below=of prog] (lex) {Lexing};
+\node[blueb, below=of lex] (par) {Parsing};
+\node[blueb, below=of par] (typ) {Typing};
+\node[blueb, below=of typ] (lam) {Lambda};
+\node[blueb, below=of lam] (clam) {Clambda};
+\node[blueb, below=of clam] (cmm) {Cmm};
+\node[blueb, below=of cmm] (mac) {Mach};
+\node[blueb, below=of mac] (lin) {Linearize};
+\node[blueb,below=of lin] (cgen) {Code generation};
+\node[blueb,below=of cgen] (asm) {Assembling - Linking};
+\node[blueb,fill=mypink,below=of asm] (bin) {OCaml binary};
+\node[left=of bin] (o) {Output};
+\end{tikzpicture}
+\end{figure}
+
 The source program goes through multiple passes/transformations:
 
 \begin{description}
@@ -177,20 +209,24 @@ and vice versa
 
 \subsection{Runtime location of variables}
 
-operating over the mach IR AST
-somewhat can be traversed like a CFG with branches
-
-available\_regs/ranges
 
 Add 2 passes into the backend: available\_regs and available\_ranges
-using forward data-flow analysis operating on Mach IR AST, can be traversed like
+using forward data-flow analysis operating on Mach IR, can be traversed like
 a CFG
 
-passes takes a function expressed in Mach code as input
+% https://stackoverflow.com/questions/11322163/ocaml-calling-convention-is-this-an-accurate-summary
+
+ocaml calling conventions different from C, where arguments are passed in
+registers, ocaml runtime tries to reuse registers as much as it can, variables
+spilled on the stack if no registers available
+callees are free to destroy their callers' arguments
+
+available\_regs
+takes a function expressed in Mach code as input
 return Mach code with each ins annotated with set of `registers` identifiers
 whose value can be accessed (hence available) by a debugger at runtime
 
-% todo dfa equations and pseudo code
+The data-flow equations used for a given instruction
 \[
     \textit{out}_{b} = \bigcup_{s \in succ_{b}} \textit{in}_{s}
 \]
@@ -202,11 +238,11 @@ whose value can be accessed (hence available) by a debugger at runtime
 %for s in succ(b)
   %out(b) = out(b) or in(s)
   %in(b) = (out(b) and not kill(b)) or gen(b)
-
-% available\_regs parcourt le CFG Mach d'une fonction et determine pour chaque ins manip  l'ens des regs avec un ident "disponibles",
-%cad dont la valeur peut etre inspectee par un debuggeur
-% available_ranges determine pour chaque variable/identifieur d'une fonction les intervalles ou son contenu est disponible,
-% et pour chaque intervalle, le registre qui contient cette valeur
+available\_ranges:
+operates over available\_regs output as input
+calculates for each variable/ identifier used in target function the memory
+addresses ranges where its content can be inspected, and for each range, the
+place where the content can be accessed (in registers or on the stack)
 
 \begin{algorithmic}[1]
     \If{some condition is true}
