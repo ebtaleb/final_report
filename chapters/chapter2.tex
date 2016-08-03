@@ -42,9 +42,8 @@ Binary data format
 
 Multiple techniques are used to reduce the size of the debugging information:
 
-LEB128 is a variable length compression encoding
-it allows for encoding of signed and unsigned integers of arbitrary size.
-Used in DWARF to encode values of various fields (like attributes)
+LEB128 is a variable length compression encoding for storage of signed and unsigned integers of arbitrary size.
+It is used in DWARF to encode values of various fields (like attributes).
 
 Some of the section tables can become quite large.
 In order to save space, those tables are encoded as bytecode instructions to be executed by state machines to obtain their fully expanded form
@@ -80,24 +79,26 @@ It is hence possible for attributes values to reference other DIEs and DWARF sec
 \end{description}
 
 A DIE can be nested in another parent DIE, have siblings and children,
-can be represented as a tree with an arbitrary number of children
+can be represented as a tree with an arbitrary number of children.
 
-The subprogram DIE owns DIEs describing the subprogram.
+For example, a subprogram DIE owns child DIEs describing the subprogram.
 
 \subsection{Compilation unit}
 
 It designates two entities :
 
-each separately compiled source file is considered as a compilation unit
-the root of a DIE tree that starts the DWARF data for the source file it represents
-It contains general information about the compilation,
-such as the programming language, the compiler version used, source file name, flags
+\begin{itemize}
+    \item each separately compiled source file is considered as a compilation unit
+    \item the root of a DIE tree that starts the DWARF data for the source file it represents
+        It contains general information about the compilation,
+        such as the programming language, the compiler version used, source file name, flags
+\end{itemize}
 
 \section{Example}
 
 \section{The ocplib-dwarf library}
 
-Working with DWARF programmatically
+Working with DWARF programmatically in OCaml
 it is a library written in OCaml that reads and prints DWARF data in a human readable format similar to objdump
 made in a effort to learn and comprehend the DWARF format during the internship.
 
