@@ -52,6 +52,8 @@
 
 \usepackage{pifont}
 
+\usepackage{afterpage}
+
 \newcommand*\tick{\item[\ding{51}]}
 \newcommand*\fail{\item[\ding{55}]}
 
@@ -66,6 +68,8 @@
 
 \usepackage{tikz}
 \usetikzlibrary{positioning}
+\usetikzlibrary{shadows,arrows}
+\tikzstyle{line} = [draw, thick, color=black!50, -latex']
 
 \definecolor{mybluei}{RGB}{124,156,205}
 \definecolor{myblueii}{RGB}{73,121,193}
@@ -93,7 +97,6 @@
     \input{./chapters/chapter3}
     \input{./chapters/chapter4}
     \input{./chapters/chapter5}
-    \input{./chapters/chapter6}
 
 % ---------------------------------------------------------------
 \backmatter

@@ -1,22 +1,95 @@
-\chapter{Evaluation\label{cha:chapter5}}
+Améliorations
+Work left to do
 
-In this chapter the implementation of Component X is evaluated. An example instance was created for every service. The following chapter validates the component implemented in the previous chapter against the requirements.
+Enhancements
+
+User experience/interface minor:
+- no function name symbol displayed in the backtrace
+- global variables becomes available/displayed after second call to `frame variable`
+
+Extensions
+Work being done in same direction
+
+\chapter{Conclusion\label{cha:chapter5}}
+The final chapter summarizes the thesis. The first subsection outlines the main ideas behind Component X and recapitulates the work steps. Issues that remained unsolved are then described. Finally the potential of the proposed solution and future work is surveyed in an outlook.
+
+\section{Summary\label{sec:summary}}
+
+Explain what you did during the last 6 month on 1 or 2 pages!
 \\
 \\
-Put some screenshots in this section! Map the requirements with your proposed solution. Compare it with related work. Why is your solution better than a concurrent approach from another organization?
+\noindent The work done can be summarized into the following work steps
 
-\section{Test Environment\label{sec:testenvir}}
+\begin{itemize}
+		\item Analysis of available technologies
+		\vspace{-0.11in}
+		\item Selection of 3 relevant services for implementation
+		\vspace{-0.11in}
+		\item Design and implementation of X on Windows
+		\vspace{-0.11in}
+		\item Design and implementation of X on mobile devices
+		\vspace{-0.11in}
+		\item Documentation based on X
+		\vspace{-0.11in}
+		\item Evaluation of the proposed solution
+\end{itemize}
 
-Fraunhofer Institute FOKUS' Open IMS Playground was used as a test environment for the telecommunication services. The IMS Playground ...
+\section{Dissemination\label{sec:dissemination}}
 
-\section{Scalability\label{sec:scal}}
+Who uses your component or who will use it?
 
-Lorem Ipsum
+Developers, OCaml users, system programmers
+without needing knowledge of target architecture
 
-\section{Usability\label{sec:usab}}
+Industry projects, EU projects, open source...? Is it integrated into a larger environment? Did you publish any papers?
 
-Lorem Ipsum
+\section{Problems Encountered\label{sec:problems}}
 
-\section{Performance Measurements\label{sec:performance}}
+Summarize the main problems. How did you solve them? Why didn't you solve them?
 
-Lorem Ipsum
+\section{Outlook\label{sec:outlook}}
+%\item Systèmes visés: Linux x86 64 bits
+%\item Plupart des outils encore non disponible au public
+% en particulier le fork du compilateur avec support pour profiling memoire
+% devrait etre mis a disposition au public dans un futur plus ou moins proche
+Emission DWARF \autocite{libmond} \autocite{dwpr}
+may be available for OCaml 4.05, still a prototype
+
+most of the improvements brought by the original developer concerns mostly a
+new, middle end, inlining compiler pass called flambda
+
+
+LLDB plugin reached the LLDB codebase,
+release for 3.9.0 maybe?
+
+
+%\item Plugin LLDB OCaml et ocp-dwarf peuvent être rendus disponible
+% pour peu que la PR soit soumise
+% mais modifications moins maintenables et touchant plus au debugger lui meme que le plugin
+% compilateur reste a reste modifie en consequence
+%\item ocp-lldb déjà disponible
+%mais necessite fork avec memprof
+%la branche sur laquelle je travaille necessite un autre fork encore avec mes ajouts
+
+% Challenges et difficultes
+%\item Augmenter le nombre de dbg events/locations
+% chronophage car precision de methode naive + temps de compilation de la compiler suite
+% comment faire composer les differents constructs ensemble
+% Modifications entre debugger et compiler
+
+ce que vous avez appris pendant votre stage que ce soit techniquement, méthodologiquement,
+en termes de savoir-être en entreprise
+
+I benefited in many ways from that internship:
+
+inner workings of the ocaml toolchain
+acquaintance with multiple codebases (lldb, ocaml)
+implementation of a standardized file format (DWARF)
+how debugging info is collected, synthetized and used in a debugger
+contribution to open source software
+
+learned to
+
+weekly reporting of progress
+time management between multiple related projects in parallel
+compartimentation of related work in separate branchs using VCS

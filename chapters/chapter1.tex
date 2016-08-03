@@ -2,11 +2,14 @@
 
 There are things to be aware of when dealing with \gls{native}:
 \begin{itemize}
-    \item the instructions themselves do not retain any information about the abstractions of the source programming language in the original source code, because the CPU does not need them to run the program,
-
+    \item it does not retain any information about
+        the abstractions of the source programming language in the original
+        source code, because the CPU does not need them to run the program,
 %backend compiler passes
 %reorganize and reposition instructions
-\item compiler \glspl{optim} can move, add and transform \glspl{ir} in such a way that it might not be possible to identify which source code statement correpsond to a particular set of instructions.
+    \item compiler \glspl{optim} can move, add and transform \glspl{ir}
+        in such a way that it might not be possible to identify which
+        source code statement corresponds to a particular set of instructions.
 \end{itemize}
 
 Hence, compilation of a program to native code involve a huge loss of information, information that is usually collected by compilers and bundled with binaries and \glspl{objectfile} in the form of debugging information for debuggers.
@@ -16,34 +19,53 @@ Hence, compilation of a program to native code involve a huge loss of informatio
 There are three main reasons for this work :
 
 \begin{itemize}
-    \item Cases where it is necessary to debug native code may arise, e.g a bug appearing only in an optimized version of a program.
-    \item There is for now no unified solution for debugging OCaml native code on any platform. Some work was made, the bare minimum is here (\gls{backtrace} support, partial step by step into function entry points and function calls), but mainstream debuggers (gdb and lldb) remain for now largely unaware that they might deal with OCaml native programs
-    \item In that situation, inspecting disassembled code instruction by instruction and raw memory becomes a tedious task in a large program, that requires knowledge of the target architecture and the OCaml native runtime (management of values), hence the need for a high-level native debugger.
+    \item Cases where it is necessary to debug native code may arise, e.g a bug
+        appearing only in an optimized version of a program.
+    \item For now, there is no unified solution for debugging OCaml native
+        code on any platform. The bare minimum is here (\gls{backtrace} support,
+        partial step by step into function entry points and function calls),
+        but mainstream debuggers (gdb and lldb) remain largely unaware that they
+        might deal with OCaml native programs.
+    \item In that situation, inspecting disassembled code instruction by
+        instruction and raw memory becomes a tedious task in a large program,
+        that requires knowledge of the target architecture and the OCaml native
+        runtime, hence the need for a source-level native debugger.
         % only low level view of program available
 \end{itemize}
 
 \section{Objectives and scope\label{sec:objective}}
 
-The work presented here aims to improve debugging experience concerning OCaml native compiled code
+The work presented here aims to improve debugging experience concerning OCaml
+native compiled code. \\
 It involves coordination between the compiler and the debugger:
 
 \begin{itemize}
-    \item Modifying the OCaml native compiler to output more debugging information, such as line information (mapping between lines in source code and machine code addresses) and runtime location of variables
-    \item Storing that information in a format that a debugger can make sense of
+    \item Modifying the OCaml native compiler to output more debugging
+        information, such as line information (mapping between lines in source
+        code and machine code addresses) and runtime location of variables, and
+        storing that information in a format that a debugger can make
+        sense of.
+    \item  Improving an OCaml native debugger prototype, written in OCaml and using LLDB
+        API bindings, and implementing the main features found in a source-level
+        debugger (setting breakpoints, proper symbol handling, stepping into the source
+        code, printing values of variables)
 \end{itemize}
-
-Improve a prototype of OCaml native debugger, written in OCaml and using LLDB bindings.
-Implement the main features found in a source-level debugger,
-set breakpoints, print variable values, proper symbol handling, source stepping into the source code, printing values of variables
 
 \section{About OCamlPro\label{sec:scope}}
 
-The OCamlPro company does mainly research and development and provides consulting services for the purpose of developing and promoting OCaml in the software development industry
-Highlights include OCaml online learning, contributions to the Open Source Software community, in particular additions to
-the OCaml compiler suite toolchain, a SMT solver, tools for learning OCaml online
+The OCamlPro company does mainly research and development and provides
+consulting services for the purpose of developing and promoting OCaml in the
+software development industry.
+Notable products/highlights include OCaml online learning tools, contributions
+to the Open Source Software community, in particular additions to the OCaml
+compiler suite and the SMT solver Alt-Ergo.
 
-ne consacrez pas plus d’une page
-à la description de l’entreprise et du contexte du stage
+%ne consacrez pas plus d’une page
+%à la description de l’entreprise et du contexte du stage
+
+%Internship context
+
+%Intern bound to research and development
 
 %Internship timeline (every forthnight)
 
@@ -56,9 +78,6 @@ In \textbf{Chapter \ref{cha:chapter3}} we will have a look at the OCaml compiler
 \\
 \\
 \textbf{Chapter \ref{cha:chapter4}} will tackle the OCaml runtime management of values will be explained, introduces to LLDB and related binding ocplib-lldb
-\\
-\\
-\textbf{Chapter \ref{cha:chapter5}} is usually termed 'Evaluation' or 'Validation'. How did you test it? In which environment? How does it scale? Measurements, tests, screenshots. How does it fare?
 \\
 \\
 \textbf{Chapter \ref{cha:chapter6}} summarizes the thesis, describes the problems that occurred and gives an outlook about future work.
