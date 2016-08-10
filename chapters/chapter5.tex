@@ -1,11 +1,37 @@
 Améliorations
 Work left to do
 
+Those additions were done and tested on a x86 64-bit system using Linux, on a
+closed project fork of the OCaml compiler, including memory profiling facilities.
+
+debugging events propagation specific to the clambda middle end
+
+improvements brought by the original developer concerns mostly a
+new, middle end, inlining compiler pass called flambda.
+
+infinity of programs with combination of constructs to test whether they play
+out nicely together
+
+%case of if\_const\_int.ml: goes back in the source to perform assignment to the
+%b variable somewhat makes sense, although counter intuitive
+
+global values bindings/vars are unmangled and see below
+
 Enhancements
+
+value inconsistencies
+addition of .loc directives due to debugging events propagation the compiler is not aware of
+the address ranges variables are available at
+
+the available\_ranges pass is not exempt of bugs either, still experimental
 
 User experience/interface minor:
 - no function name symbol displayed in the backtrace
-- global variables becomes available/displayed after second call to `frame variable`
+- global variables becomes available/displayed only after second call to `frame variable`
+
+- value identifiers inserted at the lambda pass (bound, clos, index for loop,
+match), not present in cmt/typedtree
+- make it possible to "coerce"/typecast value?
 
 Extensions
 Work being done in same direction
@@ -55,17 +81,23 @@ Summarize the main problems. How did you solve them? Why didn't you solve them?
 Emission DWARF \autocite{libmond} \autocite{dwpr}
 may be available for OCaml 4.05, still a prototype
 
-most of the improvements brought by the original developer concerns mostly a
-new, middle end, inlining compiler pass called flambda
-
 
 LLDB plugin reached the LLDB codebase,
-release for 3.9.0 maybe?
+release for 4.0
 
+other patches still have to be integrated, may depend on the final form of the
+debugging features
 
-%\item Plugin LLDB OCaml et ocp-dwarf peuvent être rendus disponible
-% pour peu que la PR soit soumise
-% mais modifications moins maintenables et touchant plus au debugger lui meme que le plugin
+work done on ocp-lldb and ocplib-dwarf has been submitted
+awaiting integration to typerex-binutils, reimplementation of the binutils tools
+in OCaml and typerex-lldb
+
+pull requests can be seen at
+
+https://github.com/OCamlPro/typerex-lldb/pull/4
+and
+https://github.com/OCamlPro/typerex-binutils/pull/1
+
 % compilateur reste a reste modifie en consequence
 %\item ocp-lldb déjà disponible
 %mais necessite fork avec memprof
@@ -82,11 +114,10 @@ en termes de savoir-être en entreprise
 
 I benefited in many ways from that internship:
 
-inner workings of the ocaml toolchain
-acquaintance with multiple codebases (lldb, ocaml)
-implementation of a standardized file format (DWARF)
-how debugging info is collected, synthetized and used in a debugger
-contribution to open source software
+I learned about inner workings of the OCaml toolchain,
+I acquainted myself with multiple projects (OCaml, lldb) and contributed to their
+codebases
+I learned how debugging information is collected, synthetized and used in a debugger
 
 learned to
 

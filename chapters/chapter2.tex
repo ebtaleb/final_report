@@ -1,23 +1,21 @@
 \chapter{Introduction to the DWARF format\label{cha:chapter2}}
 
-To establish correspondence between high-level source code and low-level machine code, one wants to
+To establish correspondence between high-level source code and low-level machine
+code, one wants to:
 \begin{itemize}
-    \item  collect all information generated im the compiling process
-    \item  and represent that information in a suitable format usable by debuggers, concisely and compactly
+    \item collect all information generated in the compiling process
+    \item and represent that information in a suitable format usable by debuggers, concisely and compactly
 \end{itemize}
 
-DWARF is a debugging data format allowing support for source level debugging
-it has with the following characteristics:
+DWARF is a debugging data format allowing support for source level debugging.
 
-It is widely used today
-it is language agnostic, independent of compiler tooling (linker/assembler),
-target architecture and debuggers.
-It is somewhat object file agnostic, although mostly associated with the ELF object file format.
-
-it is standardized, meaning it has specifications and norms codified into
-a formal document.
-A commitee oversees additions/extensions to the standard to follow the
-appearance of programming languages and their evolution
+\begin{itemize}
+    \item it is language agnostic, independent of compiler tooling (linker/assembler), target architecture and debuggers.
+    \item it is somewhat object file agnostic, although it was designed along the ELF object file format.
+    \item it is standardized, meaning it has specifications and norms codified into
+        a formal document. A commitee oversees extensions to the standard to
+        follow the appearance of programming languages and their evolution
+\end{itemize}
 
 \section{Important DWARF sections and their contents}
 
@@ -38,15 +36,18 @@ The debugging information is stored in sections in the object file.
 In the separate compilation process, the DWARF sections of each object file are
 put together in their common corresponding section in the final binary
 
-Binary data format
+\subsection{Binary data format}
 
 Multiple techniques are used to reduce the size of the debugging information:
 
-LEB128 is a variable length compression encoding for storage of signed and unsigned integers of arbitrary size.
-It is used in DWARF to encode values of various fields (like attributes).
-
-Some of the section tables can become quite large.
-In order to save space, those tables are encoded as bytecode instructions to be executed by state machines to obtain their fully expanded form
+\begin{itemize}
+    \item LEB128 is a variable length compression algorithm for storage of
+        signed and unsigned integers of arbitrary size.
+        It is used in DWARF to encode values of various fields (like attributes).
+    \item Some of the section tables can become quite large in size.
+        In order to save space, those tables are encoded as bytecode instructions
+        to be executed by state machines to obtain their fully expanded form.
+\end{itemize}
 
 \section{Structure}
 
@@ -98,12 +99,13 @@ It designates two entities :
 
 \section{The ocplib-dwarf library}
 
-Working with DWARF programmatically in OCaml
-it is a library written in OCaml that reads and prints DWARF data in a human readable format similar to objdump
-made in a effort to learn and comprehend the DWARF format during the internship.
+%it is a library written in OCaml
 
-DWARF emission writing and editing features are not yet implemented
-not sure it is useful, as this task is left to compilers
+It allows its users to work with DWARF data programmatically in OCaml,
+reads and prints DWARF data in a human readable format similar to objdump.
+This tool was made in a effort to learn about the DWARF format during the internship.
+
+The DWARF emission writing and editing features are not yet implemented.his task is left to compilers
 
 high level desc
 
@@ -122,3 +124,6 @@ printing module operates on DWARF data structures in ocaml
 
 hexadecimal view available for debugging purposes
 
+It could be possible to use that library in a custom debugger fully in OCaml
+% not used in ocp-lldb, since LLDB already handles that information
+% except for the ptrace primitives, would use FFI

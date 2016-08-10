@@ -108,9 +108,6 @@ greenb/.style={blueb,fill=mygreen},
 
 \section{Additions to the compiler}
 
-Those additions were done and tested on a x86 64-bit system using Linux, on a
-closed project fork of the OCaml compiler, including memory profiling facilities.
-
 \subsection{Location information}
 
 Let us define first what a debugging event is, quoting the OCaml manual:
@@ -157,15 +154,28 @@ Then, location information was attached to some particular constructs:
 
 \begin{itemize}
     \item integers - as empty list [] and None from the option type represented as integers
-    \item
-primitives - explain what a primitive is, what it is responsible for
+        useful in pattern matching as well
+    \item primitives - in particular :
 
-prim operations mirroring bytecode instructions maybe?
-may refer to external C function
-assignments, allocation, comparisons, /string/float/integer/boolean operations,
-boxed/unboxed
+%- explain what a primitive is, what it is responsible for
 
-setfield primitive - responsible for mutable assignments
+%prim operations mirroring bytecode instructions maybe?
+%may refer to external C function
+%assignments, allocation, comparisons, string/float/integer/boolean operations,
+%boxed/unboxed
+        \begin{itemize}
+            \item
+                Test comparisons in if-then-else statements
+                since primitives have location information, it is possible to
+                stop at the comparison test.
+                Pattern matching can take advantage of this too, since they are compiled into
+                if and switches constructs at the lambda pass.
+            \item
+                setfield primitive - responsible for mutable assignments of variables, mutable
+                fields in records and non-constant let assignments
+            \item
+                allocation - before initializing any boxed values
+        \end{itemize}
 \end{itemize}
 
 At the code generation step, the code emitter uses two notable debugging
@@ -188,10 +198,7 @@ compilation process:
 \end{description}
 
 \begin{itemize}
-\tick more info
-\fail less precision
-\end{itemize}
-
+\fail
 Heavy modifications on the backend
 % huge patch when trying to add a debugging field to every IR node
 % languages des passes backend natif n'a pas prevu pour l'adjonction d'info de debug
@@ -203,19 +210,25 @@ location information directives are not put at the
 most suitable assembly instruction, and values might not be updated when they should
 at some point in the source
 and vice versa
+\tick Although the initial work require a bug code patch, further modifications
+and information propagation becomes easier, as opposed to add a location field
+to every construct record definition
+\tick Can step more naturraly into imperative constructs
+(pattern matching/branching, assignments)
+\end{itemize}
 
 \subsection{Runtime location of variables}
 
-ocaml calling conventions different from C, where arguments are passed in
-registers first and then remainders on the stack, ocaml runtime tries to reuse registers as much as it can, variables
-spilled on the stack if no registers available
-
-callees can clobber destroy their callers' arguments
-intraprocedural DFA
+OCaml calling conventions differ from C, where arguments are passed in registers first
+and remainders on the stack
+The OCaml runtime tries to reuse registers as much as it can, variables
+are spilled on the stack if no registers are available.
+Callee functions can clobber/overwrite their callers' arguments.
 
 Add 2 passes into the backend: available\_regs and available\_ranges
 using forward data-flow analysis operating on Mach IR, can be traversed like
 a CFG
+intraprocedural DFA
 
 available\_regs overview :
 takes a function expressed in Mach code as input
