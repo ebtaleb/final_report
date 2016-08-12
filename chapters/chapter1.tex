@@ -7,7 +7,7 @@ There are things to be aware of when dealing with \gls{native}:
         source code, because the CPU does not need them to run the program,
 %backend compiler passes
 %reorganize and reposition instructions
-    \item compiler \glspl{optim} can move, add and transform \glspl{ir}
+    \item compiler \glspl{optim} can move, add and transform code
         in such a way that it might not be possible to identify which
         source code statement corresponds to a particular set of instructions.
 \end{itemize}
@@ -26,14 +26,15 @@ There are three main reasons for this work :
     \item For now, there is no unified solution for debugging OCaml native
         code on any platform. The bare minimum is here (\gls{backtrace} support,
         partial step by step into function entry points and function calls),
-        but mainstream debuggers (gdb and lldb) remain largely unaware that they
+        but mainstream debuggers such as gdb and lldb remain largely unaware that they
         might deal with OCaml native programs.
     \item In that situation, inspecting disassembled code instruction by
         instruction and raw memory becomes a tedious task in a large program,
         that requires knowledge of the target architecture and the OCaml native
         runtime, hence the need for a source-level native debugger.
-        % only low level view of program available
 \end{itemize}
+
+\newpage
 
 \section{Objectives and scope\label{sec:objective}}
 
@@ -50,10 +51,10 @@ It involves coordination between the compiler and the debugger:
     \item  Improving an OCaml native debugger prototype, written in OCaml and using LLDB
         API bindings, and implementing the main features found in a source-level
         debugger (setting breakpoints, proper symbol handling, stepping into the source
-        code, printing values of variables)
+        code, printing values of variables).
 \end{itemize}
 
-\section{About OCamlPro\label{sec:scope}}
+\section{About OCamlPro}
 
 The OCamlPro company does mainly research and development and provides
 consulting services for the purpose of developing and promoting OCaml in the
@@ -88,5 +89,3 @@ the native debugger ocp-lldb.
 \\
 \textbf{Chapter \ref{cha:chapter5}} will summarize the thesis,
 describe/discuss the problems that occurred (issues) and possible future work.
-
-

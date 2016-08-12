@@ -1,13 +1,106 @@
-Améliorations
-Work left to do
+\chapter{Conclusion\label{cha:chapter5}}
+The final chapter summarizes the thesis. The first subsection outlines the main ideas behind Component X and recapitulates the work steps. Issues that remained unsolved are then described. Finally the potential of the proposed solution and future work is surveyed in an outlook.
+
+\section{Summary\label{sec:summary}}
+
+Explain what you did during the last 6 month on 1 or 2 pages!
+\\
+\\
+\noindent The work done can be summarized into the following work steps:
+
+\begin{itemize}
+		\item Propagation of debugging events through the backend
+		\vspace{-0.11in}
+		\item Integration of the DWARF emitter and fixes
+		\vspace{-0.11in}
+		\item Implementation of the DWARF reading library
+		\vspace{-0.11in}
+		\item Implementation and integration of a OCaml language plugin for LLDB
+		\vspace{-0.11in}
+		\item Additions to the native debugger ocp-lldb
+\end{itemize}
+
+\section{Outlook\label{sec:outlook}}
 
 Those additions were done and tested on a x86 64-bit system using Linux, on a
-closed project fork of the OCaml compiler, including memory profiling facilities.
+closed project fork of the OCaml compiler version 4.02.1, including memory
+profiling facilities, debugging events propagation specific to the clambda
+middle end and type information inclusion into binaries.
+It should be released in the near future.
 
-debugging events propagation specific to the clambda middle end
+The OCaml language plugin reached the LLDB codebase,
+release for 4.0
 
-improvements brought by the original developer concerns mostly a
+Other remaining patches still have to be integrated into LLDB, although it
+may depend on the final form of the debugging features.
+
+The work done on ocp-lldb and ocplib-dwarf has been submitted and is now awaiting integration
+to typerex-binutils, reimplementation of the binutils tools in OCaml and typerex-lldb
+
+Pull requests can be seen
+there\footnote{\url{http://github.com/OCamlPro/typerex-lldb/pull/4}} \footnote{\url{http://github.com/OCamlPro/typerex-binutils/pull/1}}
+
+\subsection{Areas of improvements}
+
+
+\subsection{Remaining work}
+
+%\item Augmenter le nombre de dbg events/locations
+
+\subsection{Extensions}
+
+- make it possible to "coerce"/typecast value of identifiers inserted at the
+lambda pass and that the typed AST, nor the symbol table it is based on are not
+aware of.
+
+\subsection{Related works}
+
+This work\footnote{\url{http://github.com/ocaml/ocaml/pull/247}} makes backtraces aware
+of inline function calls (by creating fake stack frames?)
+It could be possible to express the inlined function attribute in DWARF data for
+inlined functions to aid the debugger.
+
+Emission DWARF \footnote{\url{http://github.com/ocaml/ocaml/pull/574}}
+may be available for OCaml 4.05, still a prototype
+
+Improvements brought by the original developer concerns mostly a
 new, middle end, inlining compiler pass called flambda.
+notable additions includes submodule inclusion in module paths and addition of
+phantom lets for access to constant values even when those values have been
+folded and are not present in the machine code.
+
+libmonda\footnote{\url{http://github.com/mshinwell/libmonda}} aims to be a
+debugger-independent, OCaml debugging layer library for helping with
+interpretation of values at runtime.
+Internal compiler data structures might change from one version to another,
+hence backwards compatibilty with prior versions should be kept in mind
+
+\section{Dissemination\label{sec:dissemination}}
+
+Who uses your component or who will use it?
+
+OCaml users, system programmers
+Developers without needing knowledge of target architecture
+
+\section{Problems Encountered\label{sec:problems}}
+
+Summarize the main problems. How did you solve them? Why didn't you solve them?
+
+value inconsistencies
+addition of .loc directives due to debugging events propagation the compiler is not aware of
+the address ranges variables are available at
+
+the available\_ranges pass is not exempt of bugs either, still experimental
+
+% chronophage car precision de methode naive + temps de compilation de la compiler suite
+% comment faire composer les differents constructs ensemble
+
+User experience/interface minor:
+- no function name symbol displayed in the backtrace
+- global variables becomes available/displayed only after second call to `frame variable`
+
+- value identifiers inserted at the lambda pass (bound, clos, index for loop,
+match), not present in cmt/typedtree
 
 infinity of programs with combination of constructs to test whether they play
 out nicely together
@@ -17,100 +110,9 @@ out nicely together
 
 global values bindings/vars are unmangled and see below
 
-Enhancements
-
-value inconsistencies
-addition of .loc directives due to debugging events propagation the compiler is not aware of
-the address ranges variables are available at
-
-the available\_ranges pass is not exempt of bugs either, still experimental
-
-User experience/interface minor:
-- no function name symbol displayed in the backtrace
-- global variables becomes available/displayed only after second call to `frame variable`
-
-- value identifiers inserted at the lambda pass (bound, clos, index for loop,
-match), not present in cmt/typedtree
-- make it possible to "coerce"/typecast value?
-
-Extensions
-Work being done in same direction
-
-\chapter{Conclusion\label{cha:chapter5}}
-The final chapter summarizes the thesis. The first subsection outlines the main ideas behind Component X and recapitulates the work steps. Issues that remained unsolved are then described. Finally the potential of the proposed solution and future work is surveyed in an outlook.
-
-\section{Summary\label{sec:summary}}
-
-Explain what you did during the last 6 month on 1 or 2 pages!
-\\
-\\
-\noindent The work done can be summarized into the following work steps
-
-\begin{itemize}
-		\item Analysis of available technologies
-		\vspace{-0.11in}
-		\item Selection of 3 relevant services for implementation
-		\vspace{-0.11in}
-		\item Design and implementation of X on Windows
-		\vspace{-0.11in}
-		\item Design and implementation of X on mobile devices
-		\vspace{-0.11in}
-		\item Documentation based on X
-		\vspace{-0.11in}
-		\item Evaluation of the proposed solution
-\end{itemize}
-
-\section{Dissemination\label{sec:dissemination}}
-
-Who uses your component or who will use it?
-
-Developers, OCaml users, system programmers
-without needing knowledge of target architecture
-
-Industry projects, EU projects, open source...? Is it integrated into a larger environment? Did you publish any papers?
-
-\section{Problems Encountered\label{sec:problems}}
-
-Summarize the main problems. How did you solve them? Why didn't you solve them?
-
-\section{Outlook\label{sec:outlook}}
-%\item Systèmes visés: Linux x86 64 bits
-%\item Plupart des outils encore non disponible au public
-% en particulier le fork du compilateur avec support pour profiling memoire
-% devrait etre mis a disposition au public dans un futur plus ou moins proche
-Emission DWARF \autocite{libmond} \autocite{dwpr}
-may be available for OCaml 4.05, still a prototype
 
 
-LLDB plugin reached the LLDB codebase,
-release for 4.0
-
-other patches still have to be integrated, may depend on the final form of the
-debugging features
-
-work done on ocp-lldb and ocplib-dwarf has been submitted
-awaiting integration to typerex-binutils, reimplementation of the binutils tools
-in OCaml and typerex-lldb
-
-pull requests can be seen at
-
-https://github.com/OCamlPro/typerex-lldb/pull/4
-and
-https://github.com/OCamlPro/typerex-binutils/pull/1
-
-% compilateur reste a reste modifie en consequence
-%\item ocp-lldb déjà disponible
-%mais necessite fork avec memprof
-%la branche sur laquelle je travaille necessite un autre fork encore avec mes ajouts
-
-% Challenges et difficultes
-%\item Augmenter le nombre de dbg events/locations
-% chronophage car precision de methode naive + temps de compilation de la compiler suite
-% comment faire composer les differents constructs ensemble
-% Modifications entre debugger et compiler
-
-ce que vous avez appris pendant votre stage que ce soit techniquement, méthodologiquement,
-en termes de savoir-être en entreprise
+\subsection{Lessons drawn from the internship}
 
 I benefited in many ways from that internship:
 
@@ -123,4 +125,5 @@ learned to
 
 weekly reporting of progress
 time management between multiple related projects in parallel
-compartimentation of related work in separate branchs using VCS
+compartimentation of the different projects in separate branchs using version control
+software

@@ -1,6 +1,6 @@
 \newglossaryentry{api}{name={API},
     description={An application programming interface is a set of code, protocols and specifications used to build software and for communication between software components}}
-    %api is source-code based, whereas abi is binary code based
+    %%api is source-code based, whereas abi is binary code based
 
 \newglossaryentry{machine}{name={machine code},
     description={set of binary code instructions that can be executed directly by a computer's CPU}}
@@ -8,7 +8,10 @@
 \newglossaryentry{native}{name={native code}, description={See \gls{machine}}}
 
 \newglossaryentry{ir}{name={IR},
-    description={An intermediary representation is a machine, language independent version of a program's source code manipulated by the compiler inbetween source and target languages}}
+    description={An intermediary representation is a machine, language
+    independent version of a program's source code manipulated by the compiler
+    inbetween source and target languages},
+    first={intermediary representation (IR)}}
 
 \newglossaryentry{optim}{name={optimization},
     description={transformation technique of computer code to make it more efficient (CPU time, memory consumption) while preserving correctness and side effects}}
@@ -23,46 +26,54 @@
     description={compiler output file consisting of machine code, linking and debugging metadata (symbols, stack unwinding information, profiling information), not directly executable}}
 
 \newglossaryentry{runtime}{name={runtime system},
-    description={software code supporting the execution of a program written in a programming language, required to implement features of the language}}
-%ex : ocamlrun for executing bytecode program, contain bytecode interpretation, memory allocation and garbage collection
+    description={software code supporting the execution of a program written in
+    a programming language, required to implement features of the language.
+E.g, ocamlrun, used to execute the bytecode program, can be considered as part
+of the OCaml runtime, as it handles bytecode interpretation, memory allocation
+and garbage collection.}}
 
 \newglossaryentry{binding}{name={binding},
-    description={Library providing an interface to another one written in a different programming language}}
+    description={library providing an interface to another one written in a different programming language}}
 
 \newglossaryentry{boxed}{name={boxed value},
-    description={wrapper structure around a primitive type (memory)allocated on the heap}}
+    description={wrapper structure around a primitive type allocated on the heap
+    memory}}
 
-%\newglossaryentry{cfg}{name={control flow graph},
-    %description={directed graph whose vertices are basic blocks / sequence of
-    %statements and edges possible transfer of control flow (order of exe/eval of ind
-    %stmts)from one BB to
-    %another - e.g branch and loop instructions, function calls and return stmts. allows modeling of all possible
-    %executions of a program}}
+\newglossaryentry{bb}{name={basic block},
+    description={sequence of statements without braching statements among them}}
 
-%\newglossaryentry{ffi}{name={foreign function interface},
-    %description={
-%can call functions /make use of an interface written in another programming language
-    %cooperate with programs written with other languages
-    %Ocaml functions called from C programs and vice versa/the other way around
-        %}}
+\newglossaryentry{cf}{name={control flow},
+    description={order of execution/evaluation of individual statements,
+    by branching, loop, function call and return statements.}}
+
+\newglossaryentry{cfg}{name={control flow graph},
+    description={directed graph whose vertices are basic blocks and edges
+    possible transfer of control flow from one basic block to
+    another. It allows modeling of all possible executions of a program.},
+    first={control flow graph (CFG)}}
+
+\newglossaryentry{ffi}{name={FFI},
+    description={A foreign function interface is a mechanism enabling cooperation of programs and functions
+    written in different programming languages, e.g OCaml functions called from
+    C programs or the other way around},
+    first={foreign funciton interface (FFI)}}
 
 \newglossaryentry{ast}{name={abstract syntax tree},
     description={tree representation of a program's source code and syntactical structure}}
 
-%\newglossaryentry{}{name={},
-    %description={}}
+\newglossaryentry{cfi}{name={CFI},
+    description={Call Frame Information. DWARF can record information
+    about where frames are located on the function call stack. This allows for
+    backtrace reconstruction and exception handling.},
+    first={call frame information (CFI)}
+    %,long={call frame information}
+    }
 
-%\newglossaryentry{}{name={},
-    %description={}}
-
-%\newglossaryentry{}{name={},
-    %description={}}
-
-%\newglossaryentry{}{name={},
-    %description={}}
-
-%\newglossaryentry{}{name={},
-    %description={}}
+\newglossaryentry{cfa}{name={CFA},
+    description={The Canonical Frame Address is the value of the stack pointer at the call
+    site in the previous frame.},
+    first={canonical frame address (CFA)},
+    }
 
 %\newglossaryentry{}{name={},
     %description={}}

@@ -4,7 +4,8 @@ To establish correspondence between high-level source code and low-level machine
 code, one wants to:
 \begin{itemize}
     \item collect all information generated in the compiling process
-    \item and represent that information in a suitable format usable by debuggers, concisely and compactly
+    \item and represent that information in a suitable format usable by
+        debuggers, concisely and in a compact manner.
 \end{itemize}
 
 DWARF is a debugging data format allowing support for source level debugging.
@@ -17,31 +18,29 @@ DWARF is a debugging data format allowing support for source level debugging.
         follow the appearance of programming languages and their evolution
 \end{itemize}
 
-\section{Important DWARF sections and their contents}
-
-%\begin{description}[leftmargin=!,labelwidth=\widthof{\bfseries .debug\_abbrev}]
-\begin{description}[labelwidth=\widthof{\bfseries .debug\_abbrev},align=parright]
-    \item[.debug\_abbrev] Abbreviations used to decode the .debug\_info section
-    \item[.debug\_frame] Call frame information table
-    \item[.debug\_info] Core DWARF data section
-    \item[.debug\_line] Line number information table
-    \item[.debug\_loc] Location lists for runtime location of variables/parameters
-    \item[.debug\_str] String table reference in .debug\_info
-\end{description}
-
 \section{Storage}
 
-The debugging information is stored in sections in the object file.
+DWARF data is emitted by the compiler at the code generation step.
+At the assembling step, it is stored in particular sections in the object file.
 
-In the separate compilation process, the DWARF sections of each object file are
-put together in their common corresponding section in the final binary
+When linking the final binary, the DWARF sections of each object file are
+put together in their common corresponding section.
 
-\subsection{Binary data format}
+Here is a description of relevant DWARF sections and their contents:
+
+\begin{description}[labelwidth=\widthof{\bfseries .debug\_abbrev},align=parright]
+    \item[.debug\_abbrev] Abbreviations used to decode the .debug\_info section
+    \item[.debug\_frame] \gls{cfi} table
+    \item[.debug\_info] Core DWARF data section
+    \item[.debug\_line] Line number information table
+    \item[.debug\_loc] Location lists for runtime location of variables and parameters
+    \item[.debug\_str] String table reference in .debug\_info
+\end{description}
 
 Multiple techniques are used to reduce the size of the debugging information:
 
 \begin{itemize}
-    \item LEB128 is a variable length compression algorithm for storage of
+    \item LEB128, a variable length compression algorithm for storage of
         signed and unsigned integers of arbitrary size.
         It is used in DWARF to encode values of various fields (like attributes).
     \item Some of the section tables can become quite large in size.
@@ -76,26 +75,64 @@ It is hence possible for attributes values to reference other DIEs and DWARF sec
     \item[DW\_AT\_stmt\_list] Offset referencing a location list
     \item[DW\_AT\_type] Reference to a type DIE
     \item[DW\_AT\_low\_pc] address of the first machine instruction
-    \item[DW\_AT\_high\_pc] address or offset/constant of the first location past the last instruction
+    \item[DW\_AT\_high\_pc] address or offset of the first location past the last instruction
 \end{description}
 
 A DIE can be nested in another parent DIE, have siblings and children,
-can be represented as a tree with an arbitrary number of children.
-
-For example, a subprogram DIE owns child DIEs describing the subprogram.
+It can be represented as a tree with an arbitrary number of children.
 
 \subsection{Compilation unit}
 
 It designates two entities :
 
 \begin{itemize}
-    \item each separately compiled source file is considered as a compilation unit
+    \item each separately compiled source file is considered as a compilation
+        unit,
     \item the root of a DIE tree that starts the DWARF data for the source file it represents
         It contains general information about the compilation,
         such as the programming language, the compiler version used, source file name, flags
 \end{itemize}
 
-\section{Example}
+\subsection{Example}
+
+An example C program and the DWARF output generated from the objdump utility can be
+found there as annexes.
+
+\begin{itemize}
+    \item  There is a single compilation unit root DIE has two functions, with information about where they are declared in the source, their names, their visibility as symbols (static to the file or not) and address ranges delimiting which instructions constitutes them.
+
+    \item  The f function entry contains several variable entries for local, i and j.
+Its frame base address is contained in the rbp register,
+and runtime location of its arguments and local variables is specified with an
+offset relative to that frame base address, e.g the argument x is located at the
+address contained in the rbp register minus 4.
+There is a offset to a base type entry for int, it is signed and takes 4 bytes.
+
+    \item j is shadowed by another variable of same name in a block, but both variables
+have different frame pointer offsets.
+
+\end{itemize}
+
+
+The program's assembly instructions are interspersed with DWARF .loc directives mapping sets of
+instructions to their respective statement location in the source.
+The \gls{cfi} directives indicate where the \gls{cfa} is on the stack at all times, even when the code is optimized.
+
+%7.10.10 .cfi_def_cfa_register register
+%.cfi_def_cfa_register modifies a rule for computing CFA. From now on register will be used instead of the old one. Offset remains the same.
+
+%7.10.11 .cfi_def_cfa_offset offset
+%.cfi_def_cfa_offset modifies a rule for computing CFA. Register remains the same, but offset is new. Note that it is the absolute offset that will be added to a defined register to compute CFA address.
+
+%7.10.13 .cfi_offset register, offset
+%Previous value of register is saved at offset offset from CFA.
+
+%usually role of saved ebp in the function prologue.
+%.cfi_def_cfa_offset 16
+ %: rbp - 8 is return address, rbp - 16 is CFA
+
+%access to base pointer from previous frame without using (e/r)bp, can be omitted
+%with optimizations, is optional
 
 \section{The ocplib-dwarf library}
 

@@ -2,31 +2,28 @@
 
 \begin{appendix}
 
-%\lstset{language=,caption=Sourcecode Listing,captionpos=b,
-%label=yahoowidgetkon,showstringspaces=false,
-%basicstyle={\fontfamily{pcr}\selectfont\footnotesize}}
-%\begin{lstlisting}
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    frame=single, % adds a frame around the code
+    xleftmargin=3.4pt,
+    xrightmargin=3.4pt
+}
 
-%\end{lstlisting}
-
-    \lstset{
-        basicstyle=\ttfamily\footnotesize,
-        frame=single, % adds a frame around the code
-        xleftmargin=3.4pt,
-        xrightmargin=3.4pt
-    }
-
-\lstinputlisting[caption=bla,language=C]{./t.c}
+\lstinputlisting[caption=C program example,language=C]{./t.c}
 \newpage
 
 \begin{minipage}{\linewidth}
-\lstinputlisting[lastline=63]{./t.dwarf}
+\lstinputlisting[lastline=52]{./t.dwarf}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\lstinputlisting[firstline=22, lastline=51]{./t_ex.s}
 \end{minipage}
 
 \newpage
 
 \begin{minipage}{\linewidth}
-\lstinputlisting[firstline=64]{./t.dwarf}
+\lstinputlisting[firstline=53]{./t.dwarf}
 \end{minipage}
 
 \end{appendix}

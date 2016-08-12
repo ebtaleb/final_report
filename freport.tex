@@ -10,7 +10,7 @@
 \usepackage{scrpage2}					% header and footer line
 \usepackage{longtable}
 \usepackage{subfigure}
-\usepackage[acronym, nonumberlist, toc]{glossaries}
+\usepackage[nonumberlist, toc]{glossaries}
 
 \usepackage[autostyle]{csquotes}
 \usepackage{biblatex}
@@ -44,6 +44,10 @@
 \pagestyle{scrheadings}
 
 \graphicspath{{./img/}}
+
+\setacronymstyle{long-short-desc}  % Print both long and short
+\renewcommand*{\acronymentry}[1]{%
+ \acronymfont{\glsentryshort{#1}} (\textnormal{\glsentrylong{#1}})} % Print it the way I want
 
 \makenoidxglossaries
 \input{./misc/glossary}

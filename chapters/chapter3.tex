@@ -192,24 +192,16 @@ compilation process:
         file and line number to the assembly instructions that follow
 \end{itemize}
 
-\begin{description}
-\pro more info
-\con less precision
-\end{description}
+Avantages and disadvantages:
 
 \begin{itemize}
 \fail
 Heavy modifications on the backend
 % huge patch when trying to add a debugging field to every IR node
 % languages des passes backend natif n'a pas prevu pour l'adjonction d'info de debug
-lack of accuracy, loss of information still occuring as code is still expanded and transformed
+\fail lack of accuracy, loss of information still occuring as code is still expanded and transformed
 %\item Valeurs disponibles pas toujours cohérentes
 % csq du manque de precision
-as a consequence of the lack of precision from the events,
-location information directives are not put at the
-most suitable assembly instruction, and values might not be updated when they should
-at some point in the source
-and vice versa
 \tick Although the initial work require a bug code patch, further modifications
 and information propagation becomes easier, as opposed to add a location field
 to every construct record definition
@@ -218,16 +210,16 @@ to every construct record definition
 \end{itemize}
 
 \subsection{Runtime location of variables}
-
-OCaml calling conventions differ from C, where arguments are passed in registers first
-and remainders on the stack
+%calling conventions differ from C
+When about to call OCaml functions, arguments are passed in registers first
+and remainders on the stack.
 The OCaml runtime tries to reuse registers as much as it can, variables
 are spilled on the stack if no registers are available.
-Callee functions can clobber/overwrite their callers' arguments.
+Callee functions can clobber their callers' arguments.
 
 Add 2 passes into the backend: available\_regs and available\_ranges
 using forward data-flow analysis operating on Mach IR, can be traversed like
-a CFG
+a \gls{cfg}
 intraprocedural DFA
 
 available\_regs overview :
@@ -297,6 +289,11 @@ unique identifier with unique stamp is generated in cases variable shadowing ove
 
 not every value binding is captured becaused of constant folding, static
 constant stored and loaded in register instead
+
+as a consequence of the lack of precision from the events,
+location information directives are not put at the
+most suitable assembly instruction, and values might not be updated when they should
+at some point in the source and vice versa
 
 \subsection{DWARF emitter}
 
