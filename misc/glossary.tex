@@ -27,10 +27,10 @@
 
 \newglossaryentry{runtime}{name={runtime system},
     description={software code supporting the execution of a program written in
-    a programming language, required to implement features of the language.
-E.g, ocamlrun, used to execute the bytecode program, can be considered as part
-of the OCaml runtime, as it handles bytecode interpretation, memory allocation
-and garbage collection.}}
+    a programming language, required to implement features of the language.\\
+        E.g, ocamlrun, used to execute the bytecode program, can be considered as part
+        of the OCaml runtime, as it handles bytecode interpretation, memory allocation
+        and garbage collection.}}
 
 \newglossaryentry{binding}{name={binding},
     description={library providing an interface to another one written in a different programming language}}
@@ -40,15 +40,15 @@ and garbage collection.}}
     memory}}
 
 \newglossaryentry{bb}{name={basic block},
-    description={sequence of statements without braching statements among them}}
+    description={sequence of statements without branching statements among them}}
 
 \newglossaryentry{cf}{name={control flow},
     description={order of execution/evaluation of individual statements,
     by branching, loop, function call and return statements.}}
 
 \newglossaryentry{cfg}{name={control flow graph},
-    description={directed graph whose vertices are basic blocks and edges
-    possible transfer of control flow from one basic block to
+    description={directed graph whose vertices are \glspl{bb} and edges
+    possible transfer of \gls{cf} from one basic block to
     another. It allows modeling of all possible executions of a program.},
     first={control flow graph (CFG)}}
 
@@ -56,7 +56,7 @@ and garbage collection.}}
     description={A foreign function interface is a mechanism enabling cooperation of programs and functions
     written in different programming languages, e.g OCaml functions called from
     C programs or the other way around},
-    first={foreign funciton interface (FFI)}}
+    first={foreign function interface (FFI)}}
 
 \newglossaryentry{ast}{name={abstract syntax tree},
     description={tree representation of a program's source code and syntactical structure}}

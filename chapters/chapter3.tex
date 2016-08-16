@@ -125,14 +125,10 @@ Then, location information was attached to some particular constructs:
 \begin{itemize}
     \item integers - as the empty list [] and None from the option type are represented as integers
         this is useful in pattern matching as well
-    \item primitives - in particular :
-
-%- explain what a primitive is, what it is responsible for
-
-%prim operations mirroring bytecode instructions maybe?
-%may refer to external C function
-%assignments, allocation, comparisons, string/float/integer/boolean operations,
-%boxed/unboxed
+    \item primitives, i.e basic operations of the language - in particular :
+        %may refer to external C function
+        %assignments, allocation, comparisons, string/float/integer/boolean operations,
+        %boxed/unboxed
         \begin{itemize}
             \item
                 Test comparisons in if-then-else statements :
@@ -141,10 +137,10 @@ Then, location information was attached to some particular constructs:
                 Pattern matching can take advantage of this too, since they are compiled into
                 if and switches constructs at the lambda pass.
             \item
-                setfield primitive - responsible for mutable assignments of variables, mutable
+                Setfield primitive - responsible for mutable assignments of variables, mutable
                 fields in records and non-constant let assignments
             \item
-                allocation - before initializing any boxed values
+                Allocations - before initializing any boxed values
         \end{itemize}
 \end{itemize}
 
@@ -204,13 +200,16 @@ The data-flow equations used for a given instruction are as follows:
     \textit{in}_{i} = (\textit{out}_{i} - \textit{kill}_{i}) \cup \textit{gen}_{i}
 \]
 
-where \textit{in} is the set of symbolic registers used by a particular variable right before
+where:
+\begin{itemize}
+    \item \textit{in} is the set of symbolic registers used by a particular variable right before
 current instruction gets executed,
-\textit{kill} the set of overwritten register variables considered as unavailable
+    \item \textit{kill} the set of overwritten register variables considered as unavailable
 because of the destructive nature of the current instruction, like a function
 call or spilling a register's content,
-and \textit{gen} the set containing registers relevant to the
+    \item and \textit{gen} the set containing registers relevant to the
 analysis for the current instruction, on the criteria of holding the value of an identifier.
+\end{itemize}
 
 A register can be considered as available at the start of an instruction
 if it is available at the end of each of the instruction's predecessors.
@@ -293,7 +292,7 @@ The OCaml compiler offers the option of exporting the \gls{ast} annotated with t
 information at the typedtree pass into a file with the cmt extension (using the
 flag -bin-annot). \\
 
-A compiler flag allowing serialization and export it as a symbol
+A compiler flag allowing serialization of the typed AST and its export as a symbol
 into the binary was adjoined, called `-dvb`.\\
 It is easier to manipulate, but comes at the cost of a bigger binary
 size.\\
