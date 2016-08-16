@@ -3,27 +3,29 @@
 \begin{appendix}
 
 \lstset{
+    numbers=left,
     basicstyle=\ttfamily\footnotesize,
     frame=single, % adds a frame around the code
     xleftmargin=3.4pt,
     xrightmargin=3.4pt
 }
 
-\lstinputlisting[caption=C program example,language=C]{./t.c}
-\newpage
+\lstinputlisting[caption=C program example,language=C, label={lst:tc}]{./t.c}
 
 \begin{minipage}{\linewidth}
-\lstinputlisting[lastline=52]{./t.dwarf}
-\end{minipage}
-
-\begin{minipage}{\linewidth}
-\lstinputlisting[firstline=22, lastline=51]{./t_ex.s}
+\lstinputlisting[firstline=22, lastline=51, label={lst:asm}, caption=x86\_64 assembly output of example program from line 4 to 11]{./t_ex.s}
 \end{minipage}
 
 \newpage
 
 \begin{minipage}{\linewidth}
-\lstinputlisting[firstline=53]{./t.dwarf}
+\lstinputlisting[lastline=52, caption=Output of .debug\_info section decoding from example program]{./t.dwarf}
+\end{minipage}
+
+\newpage
+
+\begin{minipage}{\linewidth}
+\lstinputlisting[firstline=53, firstnumber=53, label={lst:dwa}]{./t.dwarf}
 \end{minipage}
 
 \end{appendix}

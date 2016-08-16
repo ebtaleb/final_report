@@ -44,9 +44,10 @@ It involves coordination between the compiler and the debugger:
 
 \begin{itemize}
     \item Modifying the OCaml native compiler to output more debugging
-        information, such as line information (mapping between lines in source
-        code and machine code addresses) and runtime location of variables, and
-        storing that information in a format that a debugger can make
+        information,
+        %such as line information (mapping between lines in source
+        %code and machine code addresses) and runtime location of variables,
+        and storing that information in a format that a debugger can make
         sense of.
     \item  Improving an OCaml native debugger prototype, written in OCaml and using LLDB
         API bindings, and implementing the main features found in a source-level
@@ -75,17 +76,17 @@ compiler suite and the SMT solver Alt-Ergo.
 \section{Outline\label{sec:outline}}
 
 \textbf{Chapter \ref{cha:chapter2}} will give a overview of the DWARF
-data debugging format, its structure and show related work around it.
+data debugging format, its structure and related work around it.
 \\
 \\
-In \textbf{Chapter \ref{cha:chapter3}}, we will have a look at the process of
-compilation to native code and additions to that process.
+\textbf{Chapter \ref{cha:chapter3}}, we will have a look at the process of
+compilation to native code and additions done to that process.
 \\
 \\
 \textbf{Chapter \ref{cha:chapter4}} will tackle the OCaml runtime management of
-values will be explained, introduces to LLDB, related binding ocplib-lldb and
+values will be explained, introduces to LLDB, related OCaml binding ocplib-lldb and
 the native debugger ocp-lldb.
 \\
 \\
 \textbf{Chapter \ref{cha:chapter5}} will summarize the thesis,
-describe/discuss the problems that occurred (issues) and possible future work.
+discuss the problems that occurred and possible future work.
