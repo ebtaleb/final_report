@@ -1,0 +1,27 @@
+    \begin{tikzpicture}[node distance=3pt,outer sep=0pt,
+            blueb/.style={
+                draw=white,
+                fill=mybluei,
+                rounded corners,
+                text width=2.5cm,
+                font={\scriptsize\sffamily\bfseries\color{white}},
+                align=center,
+                text height=12pt,
+            text depth=9pt},
+            greenb/.style={blueb,fill=mygreen},
+        ]
+        \node[blueb, fill=mygreen] (prog) {OCaml source file};
+        \node[left=of prog] (i) {Input};
+        \node[blueb, below=of prog] (lex) {Lexing};
+        \node[blueb, below=of lex] (par) {Parsing};
+        \node[blueb, below=of par] (typ) {Typing};
+        \node[blueb, below=of typ] (lam) {Lambda};
+        \node[blueb, below=of lam] (clam) {Clambda};
+        \node[blueb, below=of clam] (cmm) {Cmm};
+        \node[blueb, below=of cmm] (mac) {Mach};
+        \node[blueb, below=of mac] (lin) {Linearize};
+        \node[blueb,below=of lin] (cgen) {Emit};
+        \node[blueb,below=of cgen] (asm) {Assembling - Linking};
+        \node[blueb,fill=mypink,below=of asm] (bin) {OCaml binary};
+        \node[left=of bin] (o) {Output};
+\end{tikzpicture}

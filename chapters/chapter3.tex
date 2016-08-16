@@ -8,7 +8,7 @@ The OCaml language support multiple programming paradigms:
     \item in contrast, in the imperative programming style,
         use of assignments to mutable variables can result in side effects
         where the return value of a routine may change across multiple executions,
-        modify some state in the program or perform I/O operations
+        modify some state in the program or perform input/output operations
         such as writing to a file.
 \end{itemize}
 
@@ -16,6 +16,8 @@ In both styles, stepping through function calls is fine, regardless of whether
 they are pure or not.
 However, in the case of side-effecting functions, one must be vary of the order of
 evaluation of arguments, as they may affect the return value.
+
+\vspace{5mm}
 
 Moreover, it may not make much sense to source debug functional constructs
 the same way one would with with equivalent imperative constructs.
@@ -26,7 +28,7 @@ logic errors, not run-time or compiler errors.
 
 \section{The native compilation process}
 
-A OCaml source program goes through multiple passes/transformations:
+A OCaml source program goes through multiple transformations:
 
 \begin{description}
     \item[lexing - lexical analysis]
@@ -50,8 +52,7 @@ A OCaml source program goes through multiple passes/transformations:
         (variable shadowing)
 
     \item[clambda]
-        closure conversion (to lexical blocks?), inlining, constant propagation
-        and folding
+        closure conversion, inlining, constant propagation and folding
 
     \item[cmm]
         primitives conversion % high level to low lvl operations
@@ -67,44 +68,13 @@ A OCaml source program goes through multiple passes/transformations:
     \item[assembling and linking final binary]
 \end{description}
 
-%\afterpage{%
-\afterpage{\clearpage}
-\begin{figure}
-  \centering
-\begin{tikzpicture}[node distance=3pt,outer sep=0pt,
-blueb/.style={
-  draw=white,
-  fill=mybluei,
-  rounded corners,
-  text width=2.5cm,
-  font={\scriptsize\sffamily\bfseries\color{white}},
-  align=center,
-  text height=12pt,
-  text depth=9pt},
-greenb/.style={blueb,fill=mygreen},
-]
-\node[blueb, fill=mygreen] (prog) {OCaml source file};
-\node[left=of prog] (i) {Input};
-\node[blueb, below=of prog] (lex) {Lexing};
-\node[blueb, below=of lex] (par) {Parsing};
-\node[blueb, below=of par] (typ) {Typing};
-\node[blueb, below=of typ] (lam) {Lambda};
-\node[blueb, below=of lam] (clam) {Clambda};
-\node[blueb, below=of clam] (cmm) {Cmm};
-\node[blueb, below=of cmm] (mac) {Mach};
-\node[blueb, below=of mac] (lin) {Linearize};
-\node[blueb,below=of lin] (cgen) {Emit};
-\node[blueb,below=of cgen] (asm) {Assembling - Linking};
-\node[blueb,fill=mypink,below=of asm] (bin) {OCaml binary};
-\node[left=of bin] (o) {Output};
-
-\path [line] (asm.south) -- node [above] {} (bin) ;
+\begin{tikzpicture}[remember picture,overlay]
+    \node[xshift=0cm,yshift=0cm] at (current page.center) {
+            \input{./tikz_pic/compil.tikz}
+        };
 \end{tikzpicture}
-\end{figure}
 
-\afterpage{\clearpage}
-%\clearpage
-%}
+\clearpage
 
 \section{Additions to the compiler}
 
@@ -148,13 +118,13 @@ type 'a expression = {
 \end{lstlisting}
 
 This has been done for every native backend pass all the way up to the linearize
-pass, whose instruction record that already contains such a field.
+pass, whose the instruction record structure already contains such a field.
 
 Then, location information was attached to some particular constructs:
 
 \begin{itemize}
-    \item integers - as empty list [] and None from the option type represented as integers
-        useful in pattern matching as well
+    \item integers - as the empty list [] and None from the option type are represented as integers
+        this is useful in pattern matching as well
     \item primitives - in particular :
 
 %- explain what a primitive is, what it is responsible for
@@ -165,7 +135,7 @@ Then, location information was attached to some particular constructs:
 %boxed/unboxed
         \begin{itemize}
             \item
-                Test comparisons in if-then-else statements
+                Test comparisons in if-then-else statements :
                 since primitives have location information, it is possible to
                 stop at the comparison test.
                 Pattern matching can take advantage of this too, since they are compiled into
@@ -192,129 +162,127 @@ compilation process:
         file and line number to the assembly instructions that follow
 \end{itemize}
 
-Avantages and disadvantages:
+Avantages and disadvantages of this method are listed below:
 
 \begin{itemize}
 \fail
-Heavy modifications on the backend
-% huge patch when trying to add a debugging field to every IR node
-% languages des passes backend natif n'a pas prevu pour l'adjonction d'info de debug
-\fail lack of accuracy, loss of information still occuring as code is still expanded and transformed
+Heavy modifications on the backend are required, as the need for a debugging
+field in intermediary languages was not anticipated by the core team. This
+affects the Clambda, Cmm and Mach passes.
+\fail This approach lacks accuracy, loss of information is still occuring as code
+is being expanded and transformed. Propagation of information for specific constructs
+must be done on a case-by-case basis.
 %\item Valeurs disponibles pas toujours cohérentes
 % csq du manque de precision
-\tick Although the initial work require a bug code patch, further modifications
-and information propagation becomes easier, as opposed to add a location field
-to every construct record definition
-\tick Can step more naturraly into imperative constructs
-(pattern matching/branching, assignments)
+\tick Although a prior application of a code patch is necessary, further modifications
+and propagation of information become easier, as opposed to add a location field
+to every construct record definition in each IR.
+\tick It allows stepping into imperative constructs such as branching and
+assignments.
 \end{itemize}
 
 \subsection{Runtime location of variables}
+
+Two additional passes were introduced into the backend, both using
+forward data-flow analysis.
+
+\clearpage
+\subsubsection{available\_regs}
+
+This pass takes a function expressed in Mach code as input, and
+return Mach code with each instructions annotated
+with a set of available variables for each instruction, that is variables whose
+value can be accessed by a debugger at runtime.
+
+Mach form is comparable to a \gls{cfg} and can be traversed as such.
+
+The data-flow equations used for a given instruction are as follows:
+\[
+    \textit{out}_{i} = \bigcup_{s \in succ_{i}} \textit{in}_{i}
+\]
+\[
+    \textit{in}_{i} = (\textit{out}_{i} - \textit{kill}_{i}) \cup \textit{gen}_{i}
+\]
+
+where \textit{in} is the set of symbolic registers used by a particular variable right before
+current instruction gets executed,
+\textit{kill} the set of overwritten register variables considered as unavailable
+because of the destructive nature of the current instruction, like a function
+call or spilling a register's content,
+and \textit{gen} the set containing registers relevant to the
+analysis for the current instruction, on the criteria of holding the value of an identifier.
+
+A register can be considered as available at the start of an instruction
+if it is available at the end of each of the instruction's predecessors.
+
 %calling conventions differ from C
 When about to call OCaml functions, arguments are passed in registers first
-and remainders on the stack.
+and the rest on the stack.
 The OCaml runtime tries to reuse registers as much as it can, variables
 are spilled on the stack if no registers are available.
 Callee functions can clobber their callers' arguments.
 
-Add 2 passes into the backend: available\_regs and available\_ranges
-using forward data-flow analysis operating on Mach IR, can be traversed like
-a \gls{cfg}
-intraprocedural DFA
+\subsubsection{available\_ranges}
 
-available\_regs overview :
-takes a function expressed in Mach code as input
-return Mach code with each ins annotated with set of `registers` identifiers
-augmented with a set of available variables for each instruction
+This pass operates over a function declaration in the Linearize language,
+annotated with information collected beforehand by available\_regs.
+It calculates for each variable/ identifier used in target function the memory
+addresses subranges where its content can be inspected, and for each subrange, the
+place where the content can be accessed (in registers or on the stack).
 
-whose value can be accessed (hence available) by a debugger at runtime
-
-The data-flow equations used for a given instruction
-\[
-    \textit{out}_{b} = \bigcup_{s \in succ_{b}} \textit{in}_{s}
-\]
-\[
-    \textit{in}_{b} = (\textit{out}_{b} - \textit{kill}_{b}) \cup \textit{gen}_{b}
-\]
-in : set of symbolic registers used by a particular variable right before
-current instruction gets executed
-
-kill : set of clobbered/overwritten reg variables considered as unavailable because of the nature of the
-current instruction
-%out(b) = 0
-%for s in succ(b)
-  %out(b) = out(b) or in(s)
-  %in(b) = (out(b) and not kill(b)) or gen(b)
-available\_ranges:
-operates over Linearize function declaration annotated with available\_regs pass
-calculates for each variable/ identifier used in target function the memory
-addresses ranges where its content can be inspected, and for each range, the
-place where the content can be accessed (in registers or on the stack)
-
-available before
-
-sub-range : starting instruction * starting label * ending label * symbolic
-register
-range : list of sub-ranges * minimal/lowest position/label * highest label
+A sub-range contains a starting instruction, a starting label, a ending label
+and a symbolic register.
+A range is made of a list of sub-ranges, a lower bound label, an upper bound label
 such as no overlaps between subranges
+Finally, a ranges dictionary maps an identifier to a particular range.
 
-%new instruction_descr in linearize.ml
+Labels are then inserted in the linearized code to demarcate variable availability in the
+function.
 
-%- Lavailable_subranges of int option ref
-%- Lprologue
+%\begin{algorithmic}[1]
+    %\If{some condition is true}
+    %\State do some processing
+    %\ElsIf{some other condition is true}
+    %\State do some different processing
+    %\ElsIf{some even more bizarre condition is met}
+    %\State do something else
+    %\Else
+    %\State do the default actions
+    %\EndIf
+%\end{algorithmic}
 
-ranges : map from identifiers to a range
-
-process each identifer found in a Linearize function declaration
-
-and insert labels to delimit/demarcate variable availability in the Linearize
-fundecl, hence it modifies it
-
-with information collected beforehand by available\_regs
-
-\begin{algorithmic}[1]
-    \If{some condition is true}
-    \State do some processing
-    \ElsIf{some other condition is true}
-    \State do some different processing
-    \ElsIf{some even more bizarre condition is met}
-    \State do something else
-    \Else
-    \State do the default actions
-    \EndIf
-\end{algorithmic}
-
-
-unique identifier with unique stamp is generated in cases variable shadowing overwrites former value
-
-not every value binding is captured becaused of constant folding, static
-constant stored and loaded in register instead
-
-as a consequence of the lack of precision from the events,
-location information directives are not put at the
-most suitable assembly instruction, and values might not be updated when they should
-at some point in the source and vice versa
+\begin{itemize}
+    \item Unique identifiers generated because of variable shadowing, and identifiers not present in the source (for
+        bookkeeping purposes such as bound checking) introduced at the lambda pass
+        are taken into account in the data-flow analysis.
+    \item Not every value binding is captured because of constant folding, where a static
+        constant is calculated and loaded as a constant in a register instead, those
+        avriable are thus not captured by the passes.
+    \item As a consequence of the lack of precision from the debugging events propagation,
+        location information directives are not put at the most suitable assembly instruction,
+        and values might not be updated when they should at some point in the source.
+\end{itemize}
 
 \subsection{DWARF emitter}
 
-using the labels generated by available\_ranges, calculates offset differences
-betweens label subranges to populate the .debug\_loc section
-
-populate the  .debug\_info as well with function/routine DIEs
-
-no type information encoded in the DWARF, will be handled later separately.
-
-output each variable DIE in its own, separate lexical block with specific range
-no nesting of lexical block
-
-DWARF information can be added to the binary using the `-gdwarf` compiler option flag.
+\begin{itemize}
+    \item Using the labels generated by available\_ranges, this module calculates offset differences
+        betweens the label subranges to populate the .debug\_loc section responsible for
+        tracking the runtime location of variables.
+    \item It also populates the .debug\_info section as well, building and encoding
+        debugging entries.
+    \item Each variable DIE is separated by a lexical block with a specific address range.
+    \item No type information is encoded in the DWARF data, as it will be handled later separately.
+    \item DWARF information can be added to the binary using the `-gdwarf` compiler option flag.
+\end{itemize}
 
 The DWARF emitter and runtime location of variables features are both credited to
 Mark Shinwell from Jane Street Europe.
 
-Minor adjustments and bug fixes were made for both to work properly with the initial codebase.
+Minor adjustments and bug fixes were made to both features to work properly with
+the OCamlPro codebase.
 
-\subsection{Type information}
+\subsection{Type information export}
 
 We can now determine where a particular variable value is located in memory, but
 we do not know how to interpret it. Type information of variables is necessary
@@ -325,11 +293,10 @@ The OCaml compiler offers the option of exporting the \gls{ast} annotated with t
 information at the typedtree pass into a file with the cmt extension (using the
 flag -bin-annot). \\
 
-Typed \gls{ast} is serialized into the binary instead of a separate file.
-
-It is more practical/easier to manipulate, but comes at the cost of a bigger binary
-size.
-It can be added to the binary using the `-dvb` compiler flag.\\
+A compiler flag allowing serialization and export it as a symbol
+into the binary was adjoined, called `-dvb`.\\
+It is easier to manipulate, but comes at the cost of a bigger binary
+size.\\
 
 That information will be used later to build a symbol table for use in the
 ocp-lldb native debugger.
