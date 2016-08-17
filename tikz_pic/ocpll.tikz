@@ -1,0 +1,18 @@
+\begin{tikzpicture}[node distance=3pt,outer sep=0pt,
+blueb/.style={
+  draw=white,
+  fill=mybluei,
+  rounded corners,
+  text width=2.5cm,
+  font={\sffamily\bfseries\color{white}},
+  align=center,
+  text height=12pt,
+  text depth=9pt},
+greenb/.style={blueb,fill=mygreen},
+]
+\node[blueb] (ocl) {ocp-lldb};
+\node[blueb,above=of ocl] (ocll) {ocplib-lldb};
+\node[blueb,above=of ocll] (lldb) {liblldb};
+\node[blueb,fill=mypink,above=of lldb] (bin) {OCaml binary};
+%\node[left=of bin] (asrs) {Output};
+\end{tikzpicture}

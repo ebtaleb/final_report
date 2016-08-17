@@ -58,36 +58,25 @@ features:
 
 \section{The ocp-lldb debugger}
 
-\begin{figure}
-  \centering
-\begin{tikzpicture}[node distance=3pt,outer sep=0pt,
-blueb/.style={
-  draw=white,
-  fill=mybluei,
-  rounded corners,
-  text width=2.5cm,
-  font={\sffamily\bfseries\color{white}},
-  align=center,
-  text height=12pt,
-  text depth=9pt},
-greenb/.style={blueb,fill=mygreen},
-]
-\node[blueb] (ocl) {ocp-lldb};
-\node[blueb,below=of ocl] (ocll) {ocplib-lldb};
-\node[blueb,below=of ocll] (lldb) {liblldb};
-\node[blueb,fill=mypink,below=of lldb] (bin) {OCaml binary};
-%\node[left=of bin] (asrs) {Output};
+%\begin{figure}
+\centering
+\begin{tikzpicture}[remember picture]
+    \node[xshift=0cm,yshift=-15cm] at (current page.north) {
+            \input{./tikz_pic/ocpll.tikz}
+        };
 \end{tikzpicture}
-\end{figure}
+%\end{figure}
+
+%\begin{figure}
+  %\centering
+%\end{figure}
 
 \subsection{ocplib-lldb}
 
-It is a library that generate \glspl{binding} to the C++ LLDB \gls{api} by parsing the
-LLDB header files. It then outputs stubs/mock functions in OCaml and C++.
+It is a library that generate \glspl{binding} to the C++ LLDB \gls{api} by parsing the LLDB header files. It then outputs stubs/mock functions in OCaml and C++.
 Most classes and methods of the API are supported, with the exception of static
 methods.
 Access to C++ objects is done through the OCaml-C \gls{ffi}.
-
 
 \subsection{ocp-lldb}
 
