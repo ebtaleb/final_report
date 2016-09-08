@@ -230,10 +230,10 @@ addresses subranges where its content can be inspected, and for each subrange, t
 place where the content can be accessed (in registers or on the stack).
 
 A sub-range contains a starting instruction, a starting label, a ending label
-and a symbolic register.
-A range is made of a list of sub-ranges, a lower bound label, an upper bound label
-such as no overlaps between subranges
-Finally, a ranges dictionary maps an identifier to a particular range.
+and a symbolic register.\\
+A range is made of a list of sub-ranges, a lower bound label and an upper bound label
+such as there are no overlaps between subranges.\\
+Finally, a ranges dictionary maps an identifier to a particular range.\\
 
 Labels are then inserted in the linearized code to demarcate variable availability in the
 function.

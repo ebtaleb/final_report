@@ -24,19 +24,23 @@ profiling facilities, debugging events propagation specific to the clambda
 middle end and type information inclusion into binaries.
 It should be released in the near future.
 
+\begin{itemize}
+
+\item
 The OCaml language plugin reached the LLDB
 codebase\footnote{\url{http://reviews.llvm.org/D22132}}, and will arrive on LLDB
 4.0.
 
-Other remaining patches such as the name demangling features
+\item Other remaining patches such as the name demangling features
 still have to be integrated into LLDB, although it
 may depend on the final form of the debugging features.
 
-The work done on ocp-lldb and ocplib-dwarf has been submitted and is now
+\item The work done on ocp-lldb and ocplib-dwarf has been submitted and is now
 awaiting integration.
 Pull requests can be seen
 there\footnote{\url{http://github.com/OCamlPro/typerex-lldb/pull/4}}
 \footnote{\url{http://github.com/OCamlPro/typerex-binutils/pull/1}}.
+\end{itemize}
 
 \subsection{Areas of improvement and remaining work}
 
@@ -50,7 +54,7 @@ there\footnote{\url{http://github.com/OCamlPro/typerex-lldb/pull/4}}
 \subsection{Extensions}
 
 \begin{itemize}
-    \item Make it possible to "coerce"/typecast value of identifiers inserted at the
+    \item Make it possible to coerce the type of identifiers inserted at the
 lambda pass and that the typed AST, nor the symbol table it is based on are not
 aware of.
 \end{itemize}
@@ -62,7 +66,7 @@ aware of.
         of inline function calls (by creating fake stack frames?)
         It could be possible to express the inlined function attribute in DWARF data for
         inlined functions to aid the debugger.
-    \item The debugging facilities given to the native OCaml compiler \footnote{\url{http://github.com/ocaml/ocaml/pull/574}}
+    \item The debugging facilities used in the present work \footnote{\url{http://github.com/ocaml/ocaml/pull/574}}
         may be available for OCaml 4.05, although they are still in an
         experimental state.
         Improvements brought by the original developer concerns mostly a
@@ -79,7 +83,7 @@ aware of.
 
 The work presented here will certainly be of interest to OCaml users and system
 programmers, developers without knowledge of assembly yet interested in native
-code performance.
+code debugging.
 
 %\section{Problems Encountered\label{sec:problems}}
 
